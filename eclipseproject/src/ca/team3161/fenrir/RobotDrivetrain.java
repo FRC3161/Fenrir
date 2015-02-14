@@ -6,6 +6,7 @@ import ca.team3161.lib.robot.RepeatingSubsystem;
 import ca.team3161.lib.utils.controls.Gamepad;
 import ca.team3161.lib.utils.controls.LogitechDualAction.LogitechAxis;
 import ca.team3161.lib.utils.controls.LogitechDualAction.LogitechControl;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Gyro;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SpeedController;
@@ -16,10 +17,13 @@ public class RobotDrivetrain extends RepeatingSubsystem {
     private final Gyro gyro;
     private final RobotDrive driveBase;
     private final SpeedController frontLeft, frontRight, backLeft, backRight;
+    private final Encoder frontLeftEncoder, frontRightEncoder, backLeftEncoder, backRightEncoder;
 
     public RobotDrivetrain(final Gamepad gamepad,
             final SpeedController frontLeft, final SpeedController frontRight,
             final SpeedController backLeft, final SpeedController backRight,
+            final Encoder frontLeftEncoder, final Encoder frontRightEncoder,
+            final Encoder backLeftEncoder, final Encoder backRightEncoder,
             final Gyro gyro) {
         super(10, TimeUnit.MILLISECONDS);
         this.frontLeft = frontLeft;
@@ -29,6 +33,10 @@ public class RobotDrivetrain extends RepeatingSubsystem {
         this.gamepad = gamepad;
         this.gyro = gyro;
         this.driveBase = new RobotDrive(frontLeft, backLeft, frontRight, backRight);
+        this.frontLeftEncoder = frontLeftEncoder;
+        this.frontRightEncoder = frontRightEncoder;
+        this.backLeftEncoder = backLeftEncoder;
+        this.backRightEncoder = backRightEncoder;
     }
 
     @Override
@@ -38,6 +46,10 @@ public class RobotDrivetrain extends RepeatingSubsystem {
         require(frontRight);
         require(backLeft);
         require(backRight);
+        require(frontLeftEncoder);
+        require(frontRightEncoder);
+        require(backLeftEncoder);
+        require(backRightEncoder);
     }
 
     private void drive() {

@@ -7,6 +7,7 @@ import ca.team3161.lib.utils.controls.Gamepad;
 import ca.team3161.lib.utils.controls.Gamepad.PressType;
 import ca.team3161.lib.utils.controls.LogitechDualAction;
 import ca.team3161.lib.utils.controls.LogitechDualAction.LogitechButton;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Gyro;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Talon;
@@ -25,17 +26,24 @@ public class Robot extends TitanBot {
                 new Drivetrain(new Talon(0)), // front left
                 new Drivetrain(new Talon(1)), // front right
                 new Drivetrain(new Talon(2)), // back left
-                new Drivetrain(new Talon(3)), // back right
+                new Drivetrain(new Talon(3)), // back right,
+                new Encoder(0, 1),
+                new Encoder(2, 3),
+                new Encoder(4, 5),
+                new Encoder(10, 11),
                 new Gyro(0)
                 );
         this.toteElevator = new ToteElevator(
                 new Drivetrain(new Talon(4)), // left elevator
                 new Drivetrain(new Talon(5)), // right elevator
                 new Drivetrain(new Talon(6)), // left intake
-                new Drivetrain(new Talon(7)) // right intake
+                new Drivetrain(new Talon(7)), // right intake
+                new Encoder(8, 9),
+                new Encoder(14, 15)
                 );
         this.binElevator = new BinElevator(
                 new Drivetrain(new Talon(8)),
+                new Encoder(12, 13),
                 new Solenoid(0)
                 );
     }

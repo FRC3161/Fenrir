@@ -1,10 +1,9 @@
 package ca.team3161.fenrir;
 
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 
 import ca.team3161.lib.robot.RepeatingSubsystem;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedController;
 
@@ -12,63 +11,36 @@ public class BinElevator extends RepeatingSubsystem {
 
     private final SpeedController controller;
     private final Solenoid solenoid;
-    private final Queue<Runnable> commandQueue = new ConcurrentLinkedQueue<>();
+    private final Encoder encoder;
 
-    public BinElevator(final SpeedController controller, final Solenoid solenoid) {
+    public BinElevator(final SpeedController controller, final Encoder encoder, final Solenoid solenoid) {
         super(50, TimeUnit.MILLISECONDS);
         this.controller = controller;
         this.solenoid = solenoid;
+        this.encoder = encoder;
     }
 
     @Override
     public void defineResources() {
         require(controller);
         require(solenoid);
-    }
-
-    private void set(final double rate) {
-        controller.set(rate);
+        require(encoder);
     }
 
     public void advance() {
-        commandQueue.offer(() -> {
-            set(0.5);
-            try {
-                Thread.sleep(TimeUnit.MILLISECONDS.toMillis(500));
-            } catch (final InterruptedException ie) {
-                // don't care
-            }
-            set(0);
-        });
     }
 
     public void retreat() {
-        commandQueue.offer(() -> {
-            set(-0.5);
-            try {
-                Thread.sleep(TimeUnit.MILLISECONDS.toMillis(500));
-            } catch (final InterruptedException ie) {
-                // don't care
-            }
-            set(0);
-        });
     }
 
     public void deployClaw() {
-        commandQueue.offer(() -> {
-            solenoid.set(true);
-        });
     }
 
     public void retractClaw() {
-        commandQueue.offer(() -> {
-            solenoid.set(false);
-        });
     }
 
     @Override
     public void task() {
-        commandQueue.forEach(Runnable::run);
     }
 
 }
