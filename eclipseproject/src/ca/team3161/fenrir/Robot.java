@@ -42,7 +42,7 @@ public class Robot extends TitanBot {
                 new Encoder(14, 15)
                 );
         this.binElevator = new BinElevator(
-                new Drivetrain(new Talon(8)),
+                new Drivetrain(new Talon(8)).setInverted(true),
                 new Encoder(12, 13),
                 new Solenoid(0)
                 );
