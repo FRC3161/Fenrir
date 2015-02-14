@@ -78,7 +78,7 @@ public class ToteElevator extends RepeatingSubsystem {
             previousElevatorCommand.cancel(true);
         }
         setElevator(-0.5);
-        previousElevatorCommand = Executors.newSingleThreadExecutor().submit(this::stopElevator);
+        previousElevatorCommand = Executors.newSingleThreadExecutor().submit(this::waitAndStopElevator);
     }
 
     public void startIntakeCommand() {
