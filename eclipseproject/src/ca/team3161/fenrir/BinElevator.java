@@ -1,7 +1,5 @@
 package ca.team3161.fenrir;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import ca.team3161.lib.robot.RepeatingSubsystem;
@@ -14,7 +12,6 @@ public class BinElevator extends RepeatingSubsystem {
     private final SpeedController controller;
     private final Solenoid solenoid;
     private final Encoder encoder;
-    private volatile Future<?> previousElevatorCommand;
 
     public BinElevator(final SpeedController controller, final Encoder encoder, final Solenoid solenoid) {
         super(50, TimeUnit.MILLISECONDS);
@@ -47,19 +44,15 @@ public class BinElevator extends RepeatingSubsystem {
     }
 
     public void advanceCommand() {
-        if (previousElevatorCommand != null) {
-            previousElevatorCommand.cancel(true);
-        }
         set(0.5);
-        previousElevatorCommand = Executors.newSingleThreadExecutor().submit(this::waitAndStop);
     }
 
     public void retreatCommand() {
-        if (previousElevatorCommand != null) {
-            previousElevatorCommand.cancel(true);
-        }
         set(-0.5);
-        previousElevatorCommand = Executors.newSingleThreadExecutor().submit(this::waitAndStop);
+    }
+
+    public void stopCommand() {
+        stop();
     }
 
     public void deployClawCommand() {

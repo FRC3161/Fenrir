@@ -1,7 +1,5 @@
 package ca.team3161.fenrir;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import ca.team3161.lib.robot.Drivetrain;
@@ -17,7 +15,6 @@ public class ToteElevator extends RepeatingSubsystem {
                 elevatorControllers, intakeControllers;
     private final Encoder leftEncoder, rightEncoder;
     private final Solenoid solenoid;
-    private volatile Future<?> previousElevatorCommand;
 
     public ToteElevator(final SpeedController leftElevator, final SpeedController rightElevator,
             final SpeedController leftIntake, final SpeedController rightIntake,
@@ -70,19 +67,15 @@ public class ToteElevator extends RepeatingSubsystem {
     }
 
     public void advanceElevatorCommand() {
-        if (previousElevatorCommand != null) {
-            previousElevatorCommand.cancel(true);
-        }
         setElevator(0.5);
-        previousElevatorCommand = Executors.newSingleThreadExecutor().submit(this::waitAndStopElevator);
     }
 
     public void retreatElevatorCommand() {
-        if (previousElevatorCommand != null) {
-            previousElevatorCommand.cancel(true);
-        }
         setElevator(-0.5);
-        previousElevatorCommand = Executors.newSingleThreadExecutor().submit(this::waitAndStopElevator);
+    }
+
+    public void stopElevatorCommand() {
+        stopElevator();
     }
 
     public void startIntakeCommand() {
