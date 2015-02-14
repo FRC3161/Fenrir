@@ -30,27 +30,35 @@ public class BinElevator extends RepeatingSubsystem {
         require(encoder);
     }
 
-    public void advance() {
+    private void set(final double rate) {
+        controller.set(rate);
+    }
+
+    private void stop() {
+        set(0);
+    }
+
+    public void advanceCommand() {
         if (previousElevatorCommand != null) {
             previousElevatorCommand.cancel(true);
         }
-        controller.set(0.5);
-        previousElevatorCommand = Executors.newSingleThreadExecutor().submit(() -> controller.set(0));
+        set(0.5);
+        previousElevatorCommand = Executors.newSingleThreadExecutor().submit(this::stop);
     }
 
-    public void retreat() {
+    public void retreatCommand() {
         if (previousElevatorCommand != null) {
             previousElevatorCommand.cancel(true);
         }
-        controller.set(0.5);
-        previousElevatorCommand = Executors.newSingleThreadExecutor().submit(() -> controller.set(0));
+        set(-0.5);
+        previousElevatorCommand = Executors.newSingleThreadExecutor().submit(this::stop);
     }
 
-    public void deployClaw() {
+    public void deployClawCommand() {
         solenoid.set(true);
     }
 
-    public void retractClaw() {
+    public void retractClawCommand() {
         solenoid.set(false);
     }
 

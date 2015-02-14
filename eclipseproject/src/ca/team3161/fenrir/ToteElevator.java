@@ -41,36 +41,52 @@ public class ToteElevator extends RepeatingSubsystem {
         require(leftEncoder);
     }
 
-    public void advanceElevator() {
+    private void setElevator(final double rate) {
+        elevatorControllers.set(rate);
+    }
+
+    private void stopElevator() {
+        setElevator(0);
+    }
+
+    private void setIntake(final double rate) {
+        intakeControllers.set(rate);
+    }
+
+    private void stopIntake() {
+        setIntake(0);
+    }
+
+    public void advanceElevatorCommand() {
         if (previousElevatorCommand != null) {
             previousElevatorCommand.cancel(true);
         }
-        elevatorControllers.set(0.5);
-        previousElevatorCommand = Executors.newSingleThreadExecutor().submit(() -> elevatorControllers.set(0));
+        setElevator(0.5);
+        previousElevatorCommand = Executors.newSingleThreadExecutor().submit(this::stopElevator);
     }
 
-    public void retreatElevator() {
+    public void retreatElevatorCommand() {
         if (previousElevatorCommand != null) {
             previousElevatorCommand.cancel(true);
         }
-        elevatorControllers.set(-0.5);
-        previousElevatorCommand = Executors.newSingleThreadExecutor().submit(() -> elevatorControllers.set(0));
+        setElevator(-0.5);
+        previousElevatorCommand = Executors.newSingleThreadExecutor().submit(this::stopElevator);
     }
 
-    public void startIntake() {
+    public void startIntakeCommand() {
         if (previousIntakeCommand != null) {
             previousIntakeCommand.cancel(true);
         }
-        intakeControllers.set(0.5);
-        previousIntakeCommand = Executors.newSingleThreadExecutor().submit(() -> intakeControllers.set(0));
+        setIntake(0.5);
+        previousIntakeCommand = Executors.newSingleThreadExecutor().submit(this::stopIntake);
     }
 
-    public void stopIntake() {
+    public void stopIntakeCommand() {
         if (previousIntakeCommand != null) {
             previousIntakeCommand.cancel(true);
         }
-        intakeControllers.set(-0.5);
-        previousIntakeCommand = Executors.newSingleThreadExecutor().submit(() -> intakeControllers.set(0));
+        setIntake(-0.5);
+        previousIntakeCommand = Executors.newSingleThreadExecutor().submit(this::stopIntake);
     }
 
     @Override

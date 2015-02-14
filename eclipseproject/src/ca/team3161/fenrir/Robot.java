@@ -59,15 +59,15 @@ public class Robot extends TitanBot {
 
     @Override
     public void robotInit() {
-        gamepad.bind(LogitechButton.A, toteElevator::advanceElevator);
-        gamepad.bind(LogitechButton.B, toteElevator::retreatElevator);
-        gamepad.bind(LogitechButton.RIGHT_TRIGGER, PressType.PRESS, toteElevator::startIntake);
-        gamepad.bind(LogitechButton.RIGHT_TRIGGER, PressType.RELEASE, toteElevator::stopIntake);
+        gamepad.bind(LogitechButton.A, toteElevator::advanceElevatorCommand);
+        gamepad.bind(LogitechButton.B, toteElevator::retreatElevatorCommand);
+        gamepad.bind(LogitechButton.RIGHT_TRIGGER, PressType.PRESS, toteElevator::startIntakeCommand);
+        gamepad.bind(LogitechButton.RIGHT_TRIGGER, PressType.RELEASE, toteElevator::stopIntakeCommand);
 
-        gamepad.bind(LogitechButton.X, binElevator::advance);
-        gamepad.bind(LogitechButton.Y, binElevator::retreat);
-        gamepad.bind(LogitechButton.LEFT_TRIGGER, binElevator::deployClaw);
-        gamepad.bind(LogitechButton.LEFT_BUMPER, binElevator::retractClaw);
+        gamepad.bind(LogitechButton.X, binElevator::advanceCommand);
+        gamepad.bind(LogitechButton.Y, binElevator::retreatCommand);
+        gamepad.bind(LogitechButton.LEFT_TRIGGER, binElevator::deployClawCommand);
+        gamepad.bind(LogitechButton.LEFT_BUMPER, binElevator::retractClawCommand);
     }
 
     @Override
