@@ -23,9 +23,9 @@ public class Robot extends TitanBot {
         this.gamepad = new LogitechDualAction(0);
         this.drivetrain = new RobotDrivetrain(
                 gamepad,
-                new Drivetrain(new Talon(0)), // front left
+                new Drivetrain(new Talon(0)).setInverted(true), // front left
                 new Drivetrain(new Talon(1)), // front right
-                new Drivetrain(new Talon(2)), // back left
+                new Drivetrain(new Talon(2)).setInverted(true), // back left
                 new Drivetrain(new Talon(3)), // back right,
                 new Encoder(0, 1),
                 new Encoder(2, 3),

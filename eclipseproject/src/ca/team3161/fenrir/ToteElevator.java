@@ -15,7 +15,7 @@ public class ToteElevator extends RepeatingSubsystem {
     private final SpeedController leftElevator, rightElevator, leftIntake, rightIntake,
                 elevatorControllers, intakeControllers;
     private final Encoder leftEncoder, rightEncoder;
-    private volatile Future<?> previousElevatorCommand, previousIntakeCommand;
+    private volatile Future<?> previousElevatorCommand;
 
     public ToteElevator(final SpeedController leftElevator, final SpeedController rightElevator,
             final SpeedController leftIntake, final SpeedController rightIntake,
@@ -57,12 +57,20 @@ public class ToteElevator extends RepeatingSubsystem {
         setIntake(0);
     }
 
+    private void waitAndStopElevator() {
+        try {
+            Thread.sleep(500);
+        } catch (final InterruptedException ie) {
+        }
+        stopElevator();
+    }
+
     public void advanceElevatorCommand() {
         if (previousElevatorCommand != null) {
             previousElevatorCommand.cancel(true);
         }
         setElevator(0.5);
-        previousElevatorCommand = Executors.newSingleThreadExecutor().submit(this::stopElevator);
+        previousElevatorCommand = Executors.newSingleThreadExecutor().submit(this::waitAndStopElevator);
     }
 
     public void retreatElevatorCommand() {
@@ -74,19 +82,11 @@ public class ToteElevator extends RepeatingSubsystem {
     }
 
     public void startIntakeCommand() {
-        if (previousIntakeCommand != null) {
-            previousIntakeCommand.cancel(true);
-        }
         setIntake(0.5);
-        previousIntakeCommand = Executors.newSingleThreadExecutor().submit(this::stopIntake);
     }
 
     public void stopIntakeCommand() {
-        if (previousIntakeCommand != null) {
-            previousIntakeCommand.cancel(true);
-        }
-        setIntake(-0.5);
-        previousIntakeCommand = Executors.newSingleThreadExecutor().submit(this::stopIntake);
+        stopIntake();
     }
 
     @Override

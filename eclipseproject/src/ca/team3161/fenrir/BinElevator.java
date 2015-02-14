@@ -38,12 +38,20 @@ public class BinElevator extends RepeatingSubsystem {
         set(0);
     }
 
+    private void waitAndStop() {
+        try {
+            Thread.sleep(500);
+        } catch (final InterruptedException ie) {
+        }
+        stop();
+    }
+
     public void advanceCommand() {
         if (previousElevatorCommand != null) {
             previousElevatorCommand.cancel(true);
         }
         set(0.5);
-        previousElevatorCommand = Executors.newSingleThreadExecutor().submit(this::stop);
+        previousElevatorCommand = Executors.newSingleThreadExecutor().submit(this::waitAndStop);
     }
 
     public void retreatCommand() {
@@ -51,7 +59,7 @@ public class BinElevator extends RepeatingSubsystem {
             previousElevatorCommand.cancel(true);
         }
         set(-0.5);
-        previousElevatorCommand = Executors.newSingleThreadExecutor().submit(this::stop);
+        previousElevatorCommand = Executors.newSingleThreadExecutor().submit(this::waitAndStop);
     }
 
     public void deployClawCommand() {
