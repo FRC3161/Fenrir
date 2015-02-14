@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 import ca.team3161.lib.robot.Drivetrain;
 import ca.team3161.lib.robot.RepeatingSubsystem;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedController;
 
 
@@ -15,11 +16,13 @@ public class ToteElevator extends RepeatingSubsystem {
     private final SpeedController leftElevator, rightElevator, leftIntake, rightIntake,
                 elevatorControllers, intakeControllers;
     private final Encoder leftEncoder, rightEncoder;
+    private final Solenoid solenoid;
     private volatile Future<?> previousElevatorCommand;
 
     public ToteElevator(final SpeedController leftElevator, final SpeedController rightElevator,
             final SpeedController leftIntake, final SpeedController rightIntake,
-            final Encoder leftEncoder, final Encoder rightEncoder) {
+            final Encoder leftEncoder, final Encoder rightEncoder,
+            final Solenoid solenoid) {
         super(50, TimeUnit.MILLISECONDS);
         this.leftElevator = leftElevator;
         this.rightElevator = rightElevator;
@@ -29,6 +32,7 @@ public class ToteElevator extends RepeatingSubsystem {
         this.intakeControllers = new Drivetrain(leftIntake, rightIntake);
         this.leftEncoder = leftEncoder;
         this.rightEncoder = rightEncoder;
+        this.solenoid = solenoid;
     }
 
     @Override
@@ -87,6 +91,14 @@ public class ToteElevator extends RepeatingSubsystem {
 
     public void stopIntakeCommand() {
         stopIntake();
+    }
+
+    public void openClawsCommand() {
+        solenoid.set(true);
+    }
+
+    public void closeClawsCommand() {
+        solenoid.set(false);
     }
 
     @Override

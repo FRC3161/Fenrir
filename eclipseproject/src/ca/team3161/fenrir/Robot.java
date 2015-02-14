@@ -39,7 +39,8 @@ public class Robot extends TitanBot {
                 new Drivetrain(new Talon(6)).setInverted(true), // left intake
                 new Drivetrain(new Talon(7)).setInverted(true), // right intake
                 new Encoder(8, 9),
-                new Encoder(14, 15)
+                new Encoder(14, 15),
+                new Solenoid(1)
                 );
         this.binElevator = new BinElevator(
                 new Drivetrain(new Talon(8)).setInverted(true),
@@ -63,6 +64,8 @@ public class Robot extends TitanBot {
         gamepad.bind(LogitechButton.B, toteElevator::retreatElevatorCommand);
         gamepad.bind(LogitechButton.RIGHT_TRIGGER, PressType.PRESS, toteElevator::startIntakeCommand);
         gamepad.bind(LogitechButton.RIGHT_TRIGGER, PressType.RELEASE, toteElevator::stopIntakeCommand);
+        gamepad.bind(LogitechButton.SELECT, toteElevator::openClawsCommand);
+        gamepad.bind(LogitechButton.START, toteElevator::closeClawsCommand);
 
         gamepad.bind(LogitechButton.X, binElevator::advanceCommand);
         gamepad.bind(LogitechButton.Y, binElevator::retreatCommand);
