@@ -61,10 +61,11 @@ public class Robot extends TitanBot {
     public void robotInit() {
         gamepad.bind(LogitechButton.A, toteElevator::advanceElevator);
         gamepad.bind(LogitechButton.B, toteElevator::retreatElevator);
-        gamepad.bind(LogitechButton.X, binElevator::advance);
-        gamepad.bind(LogitechButton.Y, binElevator::retreat);
         gamepad.bind(LogitechButton.RIGHT_TRIGGER, PressType.PRESS, toteElevator::startIntake);
         gamepad.bind(LogitechButton.RIGHT_TRIGGER, PressType.RELEASE, toteElevator::stopIntake);
+
+        gamepad.bind(LogitechButton.X, binElevator::advance);
+        gamepad.bind(LogitechButton.Y, binElevator::retreat);
         gamepad.bind(LogitechButton.LEFT_TRIGGER, binElevator::deployClaw);
         gamepad.bind(LogitechButton.LEFT_BUMPER, binElevator::retractClaw);
     }
