@@ -56,11 +56,11 @@ public class BinElevator extends RepeatingSubsystem {
     }
 
     public void deployClawCommand() {
-        solenoid.set(true);
+        solenoid.set(false);
     }
 
     public void retractClawCommand() {
-        solenoid.set(false);
+        solenoid.set(true);
     }
 
     @Override
