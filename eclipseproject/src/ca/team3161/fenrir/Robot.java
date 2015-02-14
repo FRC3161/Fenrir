@@ -35,9 +35,9 @@ public class Robot extends TitanBot {
                 );
         this.toteElevator = new ToteElevator(
                 new Drivetrain(new Talon(4)), // left elevator
-                new Drivetrain(new Talon(5)), // right elevator
-                new Drivetrain(new Talon(6)), // left intake
-                new Drivetrain(new Talon(7)), // right intake
+                new Drivetrain(new Talon(5)).setInverted(true), // right elevator
+                new Drivetrain(new Talon(6)).setInverted(true), // left intake
+                new Drivetrain(new Talon(7)).setInverted(true), // right intake
                 new Encoder(8, 9),
                 new Encoder(14, 15)
                 );
