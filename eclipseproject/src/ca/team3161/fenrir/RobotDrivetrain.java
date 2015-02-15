@@ -65,5 +65,21 @@ public class RobotDrivetrain extends RepeatingSubsystem {
     public void task() {
         drive();
     }
-
+    
+    
+    public Encoder getFLEncoder () {
+    	return frontLeftEncoder;
+    }
+    
+    public Encoder getFREncoder () {
+    	return frontRightEncoder;
+    }
+    
+    public Encoder getBLEncoder () {
+    	return backLeftEncoder;
+    }
+    
+    public Encoder getBREncoder () {
+    	return backRightEncoder;
+    }
 }

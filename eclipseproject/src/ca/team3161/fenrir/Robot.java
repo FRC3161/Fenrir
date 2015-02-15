@@ -7,8 +7,11 @@ import ca.team3161.lib.utils.controls.Gamepad;
 import ca.team3161.lib.utils.controls.Gamepad.PressType;
 import ca.team3161.lib.utils.controls.LogitechDualAction;
 import ca.team3161.lib.utils.controls.LogitechDualAction.LogitechButton;
+import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Gyro;
+import edu.wpi.first.wpilibj.Preferences;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Talon;
 
@@ -18,15 +21,16 @@ public class Robot extends TitanBot {
     private final Gamepad gamepad;
     private final ToteElevator toteElevator;
     private final BinElevator binElevator;
+    private Preferences prefs = Preferences.getInstance();
 
     public Robot() {
         this.gamepad = new LogitechDualAction(0);
         this.drivetrain = new RobotDrivetrain(
                 gamepad,
-                new Drivetrain(new Talon(0)).setInverted(true), // front left
-                new Drivetrain(new Talon(1)), // front right
-                new Drivetrain(new Talon(2)).setInverted(true), // back left
-                new Drivetrain(new Talon(3)), // back right,
+                new Drivetrain(new Talon(0)).setInverted(true), 	//front left
+                new Drivetrain(new Talon(1)), 						//front right
+                new Drivetrain(new Talon(2)).setInverted(true), 	//back left
+                new Drivetrain(new Talon(3)), 						//back right,
                 new Encoder(0, 1),
                 new Encoder(2, 3),
                 new Encoder(4, 5),
@@ -34,10 +38,10 @@ public class Robot extends TitanBot {
                 new Gyro(0)
                 );
         this.toteElevator = new ToteElevator(
-                new Drivetrain(new Talon(4)), // left elevator
-                new Drivetrain(new Talon(5)).setInverted(true), // right elevator
-                new Drivetrain(new Talon(6)).setInverted(true), // left intake
-                new Drivetrain(new Talon(7)).setInverted(true), // right intake
+                new Drivetrain(new Talon(4)), 						//left elevator
+                new Drivetrain(new Talon(5)).setInverted(true), 	//right elevator
+                new Drivetrain(new Talon(6)).setInverted(true), 	//left intake
+                new Drivetrain(new Talon(7)).setInverted(true), 	//right intake
                 new Encoder(8, 9),
                 new Encoder(14, 15),
                 new Solenoid(1)
@@ -51,6 +55,11 @@ public class Robot extends TitanBot {
 
     @Override
     public void autonomousRoutine() throws Exception {
+    	SmartDashboard.putString("Mode", "Auto Running");
+    	
+    	
+    	
+    	SmartDashboard.putString("Mode", "Auto Complete");
     }
 
     @Override
@@ -75,6 +84,10 @@ public class Robot extends TitanBot {
         gamepad.bind(LogitechButton.Y, PressType.RELEASE, binElevator::stopCommand);
         gamepad.bind(LogitechButton.LEFT_TRIGGER, binElevator::deployClawCommand);
         gamepad.bind(LogitechButton.LEFT_BUMPER, binElevator::retractClawCommand);
+        
+        SmartDashboard.putString("Mode", "On");
+        
+        CameraServer.getInstance().startAutomaticCapture();
     }
 
     @Override
@@ -83,6 +96,8 @@ public class Robot extends TitanBot {
         drivetrain.cancel();
         toteElevator.cancel();
         binElevator.cancel();
+        
+        SmartDashboard.putString("Mode", "Disabled");
     }
 
     @Override
@@ -91,10 +106,16 @@ public class Robot extends TitanBot {
         drivetrain.start();
         toteElevator.start();
         binElevator.start();
+        
+        SmartDashboard.putString("Mode", "Teleop Enabled");
     }
 
     @Override
     public void teleopRoutine() {
+    	SmartDashboard.putNumber("FL Wheel", drivetrain.getFLEncoder().getRate());
+		SmartDashboard.putNumber("FR Wheel", drivetrain.getFREncoder().getRate());
+		SmartDashboard.putNumber("BL Wheel", drivetrain.getBLEncoder().getRate());
+		SmartDashboard.putNumber("BR Wheel", drivetrain.getBREncoder().getRate());
     }
 
 }
