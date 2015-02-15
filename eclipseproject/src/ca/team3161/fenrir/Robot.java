@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.wpilibj.DigitalInput;
 
 public class Robot extends TitanBot {
 
@@ -22,7 +23,8 @@ public class Robot extends TitanBot {
     private final ToteElevator toteElevator;
     private final BinElevator binElevator;
     private Preferences prefs = Preferences.getInstance();
-
+    private DigitalInput photoswitch = new DigitalInput(19);
+    
     public Robot() {
         this.gamepad = new LogitechDualAction(0);
         this.drivetrain = new RobotDrivetrain(
@@ -57,8 +59,6 @@ public class Robot extends TitanBot {
     public void autonomousRoutine() throws Exception {
     	SmartDashboard.putString("Mode", "Auto Running");
     	
-    	
-    	
     	SmartDashboard.putString("Mode", "Auto Complete");
     }
 
@@ -87,7 +87,7 @@ public class Robot extends TitanBot {
         
         SmartDashboard.putString("Mode", "On");
         
-        CameraServer.getInstance().startAutomaticCapture();
+//        CameraServer.getInstance().startAutomaticCapture();
     }
 
     @Override
@@ -116,6 +116,7 @@ public class Robot extends TitanBot {
 		SmartDashboard.putNumber("FR Wheel", drivetrain.getFREncoder().getRate());
 		SmartDashboard.putNumber("BL Wheel", drivetrain.getBLEncoder().getRate());
 		SmartDashboard.putNumber("BR Wheel", drivetrain.getBREncoder().getRate());
+		SmartDashboard.putBoolean("Photoswitch", photoswitch.get());
     }
 
 }
