@@ -11,7 +11,8 @@ import edu.wpi.first.wpilibj.SpeedController;
 
 public class ToteElevator extends RepeatingIndependentSubsystem {
 
-    private final SpeedController leftElevator, rightElevator, leftIntake, rightIntake,
+    private static final double INTAKE_MOTOR_PWM = 0.3;
+	private final SpeedController leftElevator, rightElevator, leftIntake, rightIntake,
                 elevatorControllers, intakeControllers;
     private final Encoder leftEncoder, rightEncoder;
     private final Solenoid solenoid;
@@ -67,11 +68,11 @@ public class ToteElevator extends RepeatingIndependentSubsystem {
     }
 
     public void advanceElevatorCommand() {
-        setElevator(0.5);
+        setElevator(INTAKE_MOTOR_PWM);
     }
 
     public void retreatElevatorCommand() {
-        setElevator(-0.5);
+        setElevator(-INTAKE_MOTOR_PWM);
     }
 
     public void stopElevatorCommand() {
@@ -79,7 +80,7 @@ public class ToteElevator extends RepeatingIndependentSubsystem {
     }
 
     public void startIntakeCommand() {
-        setIntake(0.5);
+        setIntake(INTAKE_MOTOR_PWM);
     }
 
     public void stopIntakeCommand() {

@@ -9,7 +9,8 @@ import edu.wpi.first.wpilibj.SpeedController;
 
 public class BinElevator extends RepeatingIndependentSubsystem {
 
-    private final SpeedController controller;
+    private static final double MOTOR_PWM = 0.75;
+	private final SpeedController controller;
     private final Solenoid solenoid;
     private final Encoder encoder;
 
@@ -44,11 +45,11 @@ public class BinElevator extends RepeatingIndependentSubsystem {
     }
 
     public void advanceCommand() {
-        set(0.5);
+        set(MOTOR_PWM);
     }
 
     public void retreatCommand() {
-        set(-0.5);
+        set(-MOTOR_PWM);
     }
 
     public void stopCommand() {
