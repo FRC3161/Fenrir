@@ -1,8 +1,13 @@
 
 package ca.team3161.fenrir;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import ca.team3161.fenrir.EncoderMonitor.LabelledEncoder;
 import ca.team3161.lib.robot.Drivetrain;
 import ca.team3161.lib.robot.TitanBot;
+import ca.team3161.lib.robot.pid.VelocityController;
 import ca.team3161.lib.utils.controls.Gamepad;
 import ca.team3161.lib.utils.controls.Gamepad.PressType;
 import ca.team3161.lib.utils.controls.LogitechDualAction;
@@ -11,10 +16,10 @@ import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Gyro;
 import edu.wpi.first.wpilibj.Preferences;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends TitanBot {
 
@@ -22,30 +27,58 @@ public class Robot extends TitanBot {
     private final Gamepad gamepad;
     private final ToteElevator toteElevator;
     private final BinElevator binElevator;
+    private final EncoderMonitor encoderMonitor;
     private Preferences prefs = Preferences.getInstance();
     private DigitalInput photoswitch = new DigitalInput(19);
     
     public Robot() {
         this.gamepad = new LogitechDualAction(0);
-        this.drivetrain = new RobotDrivetrain(
+        
+        final Encoder FLDriveEncoder = new Encoder(0, 1);
+        final VelocityController FLDriveController = new VelocityController(new Drivetrain(new Talon(0)).setInverted(true),
+        		FLDriveEncoder, /*max rot rate*/ 0, /*kP*/0, /*kI*/0, /*kD*/0);
+        
+        final Encoder FRDriveEncoder = new Encoder(2, 3);
+        final VelocityController FRDriveController = new VelocityController(new Drivetrain(new Talon(1)),
+        		FRDriveEncoder, /*max rot rate*/ 0, /*kP*/0, /*kI*/0, /*kD*/0);
+        
+        final Encoder BLDriveEncoder = new Encoder(4, 5);
+        final VelocityController BLDriveController = new VelocityController(new Drivetrain(new Talon(2)).setInverted(true),
+        		BLDriveEncoder, /*max rot rate*/ 0, /*kP*/0, /*kI*/0, /*kD*/0);
+        
+        final Encoder BRDriveEncoder = new Encoder(10, 11);
+        final VelocityController BRDriveController = new VelocityController(new Drivetrain(new Talon(3)),
+        		BRDriveEncoder, /*max rot rate*/ 0, /*kP*/0, /*kI*/0, /*kD*/0);
+        
+        final Gyro driveGyro = new Gyro(0);
+		this.drivetrain = new RobotDrivetrain(
                 gamepad,
-                new Drivetrain(new Talon(0)).setInverted(true), 	//front left
-                new Drivetrain(new Talon(1)), 						//front right
-                new Drivetrain(new Talon(2)).setInverted(true), 	//back left
-                new Drivetrain(new Talon(3)), 						//back right,
-                new Encoder(0, 1),
-                new Encoder(2, 3),
-                new Encoder(4, 5),
-                new Encoder(10, 11),
-                new Gyro(0)
+                FLDriveController,
+                FRDriveController,
+                BLDriveController,
+                BRDriveController,
+                FLDriveEncoder,
+                FRDriveEncoder,
+                BLDriveEncoder,
+                BRDriveEncoder,
+                driveGyro
                 );
+        
+        final Encoder leftElevatorEncoder = new Encoder(8, 9);
+        final VelocityController leftElevatorController = new VelocityController(new Drivetrain(new Talon(4)),
+        		leftElevatorEncoder, /*max rot rate*/ 0, /*kP*/0, /*kI*/0, /*kD*/0);
+        
+        final Encoder rightElevatorEncoder = new Encoder (14, 15);
+        final VelocityController rightElevatorController = new VelocityController(new Drivetrain(new Talon(5)).setInverted(true),
+        		rightElevatorEncoder, /*max rot rate*/ 0, /*kP*/0, /*kI*/0, /*kD*/0);
+        
         this.toteElevator = new ToteElevator(
-                new Drivetrain(new Talon(4)), 						//left elevator
-                new Drivetrain(new Talon(5)).setInverted(true), 	//right elevator
+                leftElevatorController,
+                rightElevatorController,
                 new Drivetrain(new Talon(6)).setInverted(true), 	//left intake
                 new Drivetrain(new Talon(7)).setInverted(true), 	//right intake
-                new Encoder(8, 9),
-                new Encoder(14, 15),
+                leftElevatorEncoder,
+                rightElevatorEncoder,
                 new Solenoid(1)
                 );
         this.binElevator = new BinElevator(
@@ -53,6 +86,13 @@ public class Robot extends TitanBot {
                 new Encoder(12, 13),
                 new Solenoid(0)
                 );
+        
+        final Set<LabelledEncoder> labelledEncoders = new HashSet<>();
+        labelledEncoders.add(new LabelledEncoder("FLDE", FLDriveEncoder));
+        labelledEncoders.add(new LabelledEncoder("FRDE", FRDriveEncoder));
+        labelledEncoders.add(new LabelledEncoder("BLDE", BLDriveEncoder));
+        labelledEncoders.add(new LabelledEncoder("BRDE", BRDriveEncoder));
+        this.encoderMonitor = new EncoderMonitor(labelledEncoders);
     }
 
     @Override
@@ -88,6 +128,8 @@ public class Robot extends TitanBot {
         SmartDashboard.putString("Mode", "On");
         
 //        CameraServer.getInstance().startAutomaticCapture();
+        
+        encoderMonitor.start();
     }
 
     @Override
@@ -112,11 +154,6 @@ public class Robot extends TitanBot {
 
     @Override
     public void teleopRoutine() {
-    	SmartDashboard.putNumber("FL Wheel", drivetrain.getFLEncoder().getRate());
-		SmartDashboard.putNumber("FR Wheel", drivetrain.getFREncoder().getRate());
-		SmartDashboard.putNumber("BL Wheel", drivetrain.getBLEncoder().getRate());
-		SmartDashboard.putNumber("BR Wheel", drivetrain.getBREncoder().getRate());
-		SmartDashboard.putBoolean("Photoswitch", photoswitch.get());
     }
 
 }
