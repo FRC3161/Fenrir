@@ -37,22 +37,22 @@ public class Robot extends TitanBot {
 
         final Encoder FLDriveEncoder = new Encoder(0, 1);
         final VelocityController FLDriveController = new VelocityController(new Drivetrain(new Talon(0)).setInverted(true),
-        		FLDriveEncoder, /*max rot rate*/ 0, /*kP*/0, /*kI*/0, /*kD*/0);
-        
+                FLDriveEncoder, /*max rot rate*/ 0, /*kP*/0, /*kI*/0, /*kD*/0);
+
         final Encoder FRDriveEncoder = new Encoder(2, 3);
         final VelocityController FRDriveController = new VelocityController(new Drivetrain(new Talon(1)),
-        		FRDriveEncoder, /*max rot rate*/ 0, /*kP*/0, /*kI*/0, /*kD*/0);
-        
+                FRDriveEncoder, /*max rot rate*/ 0, /*kP*/0, /*kI*/0, /*kD*/0);
+
         final Encoder BLDriveEncoder = new Encoder(4, 5);
         final VelocityController BLDriveController = new VelocityController(new Drivetrain(new Talon(2)).setInverted(true),
-        		BLDriveEncoder, /*max rot rate*/ 0, /*kP*/0, /*kI*/0, /*kD*/0);
-        
+                BLDriveEncoder, /*max rot rate*/ 0, /*kP*/0, /*kI*/0, /*kD*/0);
+
         final Encoder BRDriveEncoder = new Encoder(10, 11);
         final VelocityController BRDriveController = new VelocityController(new Drivetrain(new Talon(3)),
-        		BRDriveEncoder, /*max rot rate*/ 0, /*kP*/0, /*kI*/0, /*kD*/0);
-        
+                BRDriveEncoder, /*max rot rate*/ 0, /*kP*/0, /*kI*/0, /*kD*/0);
+
         final Gyro driveGyro = new Gyro(0);
-		this.drivetrain = new RobotDrivetrain(
+        this.drivetrain = new RobotDrivetrain(
                 gamepad,
                 FLDriveController,
                 FRDriveController,
@@ -64,15 +64,15 @@ public class Robot extends TitanBot {
                 BRDriveEncoder,
                 driveGyro
                 );
-        
+
         final Encoder leftElevatorEncoder = new Encoder(8, 9);
         final VelocityController leftElevatorController = new VelocityController(new Drivetrain(new Talon(4)),
-        		leftElevatorEncoder, /*max rot rate*/ 0, /*kP*/0, /*kI*/0, /*kD*/0);
-        
+                leftElevatorEncoder, /*max rot rate*/ 0, /*kP*/0, /*kI*/0, /*kD*/0);
+
         final Encoder rightElevatorEncoder = new Encoder (14, 15);
         final VelocityController rightElevatorController = new VelocityController(new Drivetrain(new Talon(5)).setInverted(true),
-        		rightElevatorEncoder, /*max rot rate*/ 0, /*kP*/0, /*kI*/0, /*kD*/0);
-        
+                rightElevatorEncoder, /*max rot rate*/ 0, /*kP*/0, /*kI*/0, /*kD*/0);
+
         this.toteElevator = new ToteElevator(
                 leftElevatorController,
                 rightElevatorController,
@@ -87,7 +87,7 @@ public class Robot extends TitanBot {
                 new Encoder(12, 13),
                 new Solenoid(0)
                 );
-        
+
         final Set<LabelledEncoder> labelledEncoders = new HashSet<>();
         labelledEncoders.add(new LabelledEncoder("FLDE", FLDriveEncoder));
         labelledEncoders.add(new LabelledEncoder("FRDE", FRDriveEncoder));
@@ -98,9 +98,9 @@ public class Robot extends TitanBot {
 
     @Override
     public void autonomousRoutine() throws Exception {
-    	SmartDashboard.putString("Mode", "Auto Running");
-    	
-    	SmartDashboard.putString("Mode", "Auto Complete");
+        SmartDashboard.putString("Mode", "Auto Running");
+
+        SmartDashboard.putString("Mode", "Auto Complete");
     }
 
     @Override
@@ -131,11 +131,11 @@ public class Robot extends TitanBot {
         gamepad.bind(LogitechButton.Y, PressType.RELEASE, binElevator::stopCommand);
         gamepad.bind(LogitechButton.LEFT_TRIGGER, binElevator::deployClawCommand);
         gamepad.bind(LogitechButton.LEFT_BUMPER, binElevator::retractClawCommand);
-        
+
         SmartDashboard.putString("Mode", "On");
-        
-//        CameraServer.getInstance().startAutomaticCapture();
-        
+
+        //        CameraServer.getInstance().startAutomaticCapture();
+
         encoderMonitor.start();
     }
 
@@ -145,7 +145,7 @@ public class Robot extends TitanBot {
         drivetrain.cancel();
         toteElevator.cancel();
         binElevator.cancel();
-        
+
         SmartDashboard.putString("Mode", "Disabled");
     }
 
@@ -155,7 +155,7 @@ public class Robot extends TitanBot {
         drivetrain.start();
         toteElevator.start();
         binElevator.start();
-        
+
         SmartDashboard.putString("Mode", "Teleop Enabled");
     }
 
