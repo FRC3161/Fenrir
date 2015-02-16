@@ -10,7 +10,6 @@ import ca.team3161.lib.robot.TitanBot;
 import ca.team3161.lib.robot.pid.VelocityController;
 import ca.team3161.lib.utils.controls.Gamepad;
 import ca.team3161.lib.utils.controls.Gamepad.PressType;
-import ca.team3161.lib.utils.controls.JoystickMode;
 import ca.team3161.lib.utils.controls.LogitechDualAction;
 import ca.team3161.lib.utils.controls.LogitechDualAction.LogitechAxis;
 import ca.team3161.lib.utils.controls.LogitechDualAction.LogitechButton;
@@ -34,13 +33,7 @@ public class Robot extends TitanBot {
     private final DigitalInput photoswitch = new DigitalInput(19);
 
     public Robot() {
-        final JoystickMode deadbandMode = d -> Math.abs(d) < 0.1 ? 0 : d;
         this.gamepad = new LogitechDualAction(0);
-        for (final LogitechControl control : LogitechControl.values()) {
-            for (final LogitechAxis axis : LogitechAxis.values()) {
-                gamepad.setMode(control, axis, deadbandMode);
-            }
-        }
 
         final Encoder FLDriveEncoder = new Encoder(0, 1);
         final VelocityController FLDriveController = new VelocityController(new Drivetrain(new Talon(0)).setInverted(true),
@@ -117,6 +110,12 @@ public class Robot extends TitanBot {
 
     @Override
     public void robotInit() {
+        for (final LogitechControl control : LogitechControl.values()) {
+            for (final LogitechAxis axis : LogitechAxis.values()) {
+                gamepad.setMode(control, axis, d -> Math.abs(d) < 0.1 ? 0 : d); // deadband around [-0.1, 0.1]
+            }
+        }
+
         gamepad.bind(LogitechButton.A, toteElevator::advanceElevatorCommand);
         gamepad.bind(LogitechButton.A, PressType.RELEASE, toteElevator::stopElevatorCommand);
         gamepad.bind(LogitechButton.B, toteElevator::retreatElevatorCommand);
