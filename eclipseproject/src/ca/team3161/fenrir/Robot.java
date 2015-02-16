@@ -10,15 +10,17 @@ import ca.team3161.lib.robot.TitanBot;
 import ca.team3161.lib.robot.pid.VelocityController;
 import ca.team3161.lib.utils.controls.Gamepad;
 import ca.team3161.lib.utils.controls.Gamepad.PressType;
+import ca.team3161.lib.utils.controls.JoystickMode;
 import ca.team3161.lib.utils.controls.LogitechDualAction;
+import ca.team3161.lib.utils.controls.LogitechDualAction.LogitechAxis;
 import ca.team3161.lib.utils.controls.LogitechDualAction.LogitechButton;
-import edu.wpi.first.wpilibj.CameraServer;
+import ca.team3161.lib.utils.controls.LogitechDualAction.LogitechControl;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Gyro;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Talon;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends TitanBot {
@@ -28,12 +30,18 @@ public class Robot extends TitanBot {
     private final ToteElevator toteElevator;
     private final BinElevator binElevator;
     private final EncoderMonitor encoderMonitor;
-    private Preferences prefs = Preferences.getInstance();
-    private DigitalInput photoswitch = new DigitalInput(19);
-    
+    private final Preferences prefs = Preferences.getInstance();
+    private final DigitalInput photoswitch = new DigitalInput(19);
+
     public Robot() {
+        final JoystickMode deadbandMode = d -> Math.abs(d) < 0.1 ? 0 : d;
         this.gamepad = new LogitechDualAction(0);
-        
+        for (final LogitechControl control : LogitechControl.values()) {
+            for (final LogitechAxis axis : LogitechAxis.values()) {
+                gamepad.setMode(control, axis, deadbandMode);
+            }
+        }
+
         final Encoder FLDriveEncoder = new Encoder(0, 1);
         final VelocityController FLDriveController = new VelocityController(new Drivetrain(new Talon(0)).setInverted(true),
         		FLDriveEncoder, /*max rot rate*/ 0, /*kP*/0, /*kI*/0, /*kD*/0);
