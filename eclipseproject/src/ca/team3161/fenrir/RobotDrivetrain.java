@@ -2,7 +2,7 @@ package ca.team3161.fenrir;
 
 import java.util.concurrent.TimeUnit;
 
-import ca.team3161.lib.robot.RepeatingIndependentSubsystem;
+import ca.team3161.lib.robot.subsystem.RepeatingIndependentSubsystem;
 import ca.team3161.lib.utils.controls.Gamepad;
 import ca.team3161.lib.utils.controls.LogitechDualAction.LogitechAxis;
 import ca.team3161.lib.utils.controls.LogitechDualAction.LogitechControl;

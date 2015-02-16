@@ -30,7 +30,7 @@ public class Robot extends TitanBot {
     private final Gamepad gamepad;
     private final ToteElevator toteElevator;
     private final BinElevator binElevator;
-    private final EncoderMonitor encoderMonitor;
+//    private final EncoderMonitor encoderMonitor;
     private final Preferences prefs = Preferences.getInstance();
     private final DigitalInput photoswitch = new DigitalInput(19);
 
@@ -39,19 +39,19 @@ public class Robot extends TitanBot {
 
         final Encoder FLDriveEncoder = new Encoder(0, 1);
         final VelocityController FLDriveController = new VelocityController(new Drivetrain(new Talon(0)).setInverted(true),
-        		FLDriveEncoder, MAX_DRIVETRAIN_RATE, MAX_DRIVETRAIN_RATE/16, /*kI*/0, /*kD*/0);
+        		FLDriveEncoder, MAX_DRIVETRAIN_RATE, 0, /*kI*/MAX_DRIVETRAIN_RATE/10, /*kD*/0, Float.MAX_VALUE, 1);
         
-        final Encoder FRDriveEncoder = new Encoder(2, 3);
+        final Encoder FRDriveEncoder = new Encoder(3, 2);
         final VelocityController FRDriveController = new VelocityController(new Drivetrain(new Talon(1)),
-        		FRDriveEncoder, MAX_DRIVETRAIN_RATE, MAX_DRIVETRAIN_RATE/16, /*kI*/0, /*kD*/0);
+        		FRDriveEncoder, MAX_DRIVETRAIN_RATE, 0, /*kI*/MAX_DRIVETRAIN_RATE/10, /*kD*/0, Float.MAX_VALUE, 1);
         
         final Encoder BLDriveEncoder = new Encoder(4, 5);
         final VelocityController BLDriveController = new VelocityController(new Drivetrain(new Talon(2)).setInverted(true),
-        		BLDriveEncoder, MAX_DRIVETRAIN_RATE, MAX_DRIVETRAIN_RATE/16, /*kI*/0, /*kD*/0);
+        		BLDriveEncoder, MAX_DRIVETRAIN_RATE, 0, /*kI*/MAX_DRIVETRAIN_RATE/10, /*kD*/0, Float.MAX_VALUE, 1);
         
-        final Encoder BRDriveEncoder = new Encoder(10, 11);
+        final Encoder BRDriveEncoder = new Encoder(11, 10);
         final VelocityController BRDriveController = new VelocityController(new Drivetrain(new Talon(3)),
-        		BRDriveEncoder, MAX_DRIVETRAIN_RATE, MAX_DRIVETRAIN_RATE/16, /*kI*/0, /*kD*/0);
+        		BRDriveEncoder, MAX_DRIVETRAIN_RATE, 0, /*kI*/MAX_DRIVETRAIN_RATE/10, /*kD*/0, Float.MAX_VALUE, 1);
 
         final Gyro driveGyro = new Gyro(0);
         this.drivetrain = new RobotDrivetrain(
@@ -69,11 +69,11 @@ public class Robot extends TitanBot {
 
         final Encoder leftElevatorEncoder = new Encoder(8, 9);
         final VelocityController leftElevatorController = new VelocityController(new Drivetrain(new Talon(4)).setInverted(false),
-        		leftElevatorEncoder, MAX_ELEVATOR_RATE, MAX_ELEVATOR_RATE/6, /*kI*/0, /*kD*/0);
+        		leftElevatorEncoder, MAX_ELEVATOR_RATE, 0.0015f, /*kI*/0.003f, /*kD*/0, 1200.0f, 1);
         
-        final Encoder rightElevatorEncoder = new Encoder (14, 15);
-        final VelocityController rightElevatorController = new VelocityController(new Drivetrain(new Talon(5)).setInverted(false),
-        		rightElevatorEncoder, MAX_ELEVATOR_RATE, MAX_ELEVATOR_RATE/6, /*kI*/0, /*kD*/0);
+        final Encoder rightElevatorEncoder = new Encoder (15, 14);
+        final VelocityController rightElevatorController = new VelocityController(new Drivetrain(new Talon(5)).setInverted(true),
+        		rightElevatorEncoder, MAX_ELEVATOR_RATE, 0.0015f, /*kI*/0.003f, /*kD*/0, 1200.0f, 1);
         
         this.toteElevator = new ToteElevator(
                 leftElevatorController,
@@ -90,12 +90,12 @@ public class Robot extends TitanBot {
                 new Solenoid(0)
                 );
 
-        final Set<LabelledEncoder> labelledEncoders = new HashSet<>();
-        labelledEncoders.add(new LabelledEncoder("FLDE", FLDriveEncoder));
-        labelledEncoders.add(new LabelledEncoder("FRDE", FRDriveEncoder));
-        labelledEncoders.add(new LabelledEncoder("BLDE", BLDriveEncoder));
-        labelledEncoders.add(new LabelledEncoder("BRDE", BRDriveEncoder));
-        this.encoderMonitor = new EncoderMonitor(labelledEncoders);
+//        final Set<LabelledEncoder> labelledEncoders = new HashSet<>();
+//        labelledEncoders.add(new LabelledEncoder("FLDE", FLDriveEncoder));
+//        labelledEncoders.add(new LabelledEncoder("FRDE", FRDriveEncoder));
+//        labelledEncoders.add(new LabelledEncoder("BLDE", BLDriveEncoder));
+//        labelledEncoders.add(new LabelledEncoder("BRDE", BRDriveEncoder));
+//        this.encoderMonitor = new EncoderMonitor(labelledEncoders);
     }
 
     @Override
@@ -117,17 +117,16 @@ public class Robot extends TitanBot {
                 gamepad.setMode(control, axis, d -> Math.abs(d) < 0.1 ? 0 : d); // deadband around [-0.1, 0.1]
             }
         }
+        gamepad.bind(LogitechButton.A, PressType.PRESS, toteElevator::advanceElevatorCommand);
         gamepad.bind(LogitechButton.A, PressType.RELEASE, toteElevator::stopElevatorCommand);
-        gamepad.bind(LogitechButton.B, PressType.HOLD, toteElevator::retreatElevatorCommand);
+        gamepad.bind(LogitechButton.B, PressType.PRESS, toteElevator::retreatElevatorCommand);
         gamepad.bind(LogitechButton.B, PressType.RELEASE, toteElevator::stopElevatorCommand);
         gamepad.bind(LogitechButton.RIGHT_TRIGGER, PressType.PRESS, toteElevator::startIntakeCommand);
         gamepad.bind(LogitechButton.RIGHT_TRIGGER, PressType.RELEASE, toteElevator::stopIntakeCommand);
-        gamepad.bind(LogitechButton.SELECT, toteElevator::openClawsCommand);
-        gamepad.bind(LogitechButton.START, toteElevator::closeClawsCommand);
 
-        gamepad.bind(LogitechButton.X, binElevator::advanceCommand);
+        gamepad.bind(LogitechButton.X, binElevator::retreatCommand);
         gamepad.bind(LogitechButton.X, PressType.RELEASE, binElevator::stopCommand);
-        gamepad.bind(LogitechButton.Y, binElevator::retreatCommand);
+        gamepad.bind(LogitechButton.Y, binElevator::advanceCommand);
         gamepad.bind(LogitechButton.Y, PressType.RELEASE, binElevator::stopCommand);
         gamepad.bind(LogitechButton.LEFT_TRIGGER, binElevator::deployClawCommand);
         gamepad.bind(LogitechButton.LEFT_BUMPER, binElevator::retractClawCommand);
@@ -136,7 +135,7 @@ public class Robot extends TitanBot {
 
         //        CameraServer.getInstance().startAutomaticCapture();
 
-        encoderMonitor.start();
+//        encoderMonitor.start();
     }
 
     @Override
@@ -161,6 +160,15 @@ public class Robot extends TitanBot {
 
     @Override
     public void teleopRoutine() {
+    	SmartDashboard.putNumber("LeftElev", toteElevator.getLeftEncoder().get());
+    	SmartDashboard.putNumber("LeftElevRate", toteElevator.getLeftEncoder().getRate());
+    	SmartDashboard.putNumber("RightElev", toteElevator.getRightEncoder().get());
+    	SmartDashboard.putNumber("RightElevRate", toteElevator.getRightEncoder().getRate());
+    	
+    	SmartDashboard.putNumber("FL Wheel", drivetrain.getFLEncoder().get());
+    	SmartDashboard.putNumber("FR Wheel", drivetrain.getFREncoder().get());
+    	SmartDashboard.putNumber("BL Wheel", drivetrain.getBLEncoder().get());
+    	SmartDashboard.putNumber("BR Wheel", drivetrain.getBREncoder().get());
     }
 
 }
