@@ -23,7 +23,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends TitanBot {
 
-    private final RobotDrivetrain drivetrain;
+	public static final int MAX_DRIVETRAIN_RATE = 1500;
+	public static final int MAX_ELEVATOR_RATE = 600;
+	private final RobotDrivetrain drivetrain;
     private final Gamepad gamepad;
     private final ToteElevator toteElevator;
     private final BinElevator binElevator;
@@ -36,19 +38,19 @@ public class Robot extends TitanBot {
         
         final Encoder FLDriveEncoder = new Encoder(0, 1);
         final VelocityController FLDriveController = new VelocityController(new Drivetrain(new Talon(0)).setInverted(true),
-        		FLDriveEncoder, /*max rot rate*/ 0, /*kP*/0, /*kI*/0, /*kD*/0);
+        		FLDriveEncoder, MAX_DRIVETRAIN_RATE, MAX_DRIVETRAIN_RATE/16, /*kI*/0, /*kD*/0);
         
         final Encoder FRDriveEncoder = new Encoder(2, 3);
         final VelocityController FRDriveController = new VelocityController(new Drivetrain(new Talon(1)),
-        		FRDriveEncoder, /*max rot rate*/ 0, /*kP*/0, /*kI*/0, /*kD*/0);
+        		FRDriveEncoder, MAX_DRIVETRAIN_RATE, MAX_DRIVETRAIN_RATE/16, /*kI*/0, /*kD*/0);
         
         final Encoder BLDriveEncoder = new Encoder(4, 5);
         final VelocityController BLDriveController = new VelocityController(new Drivetrain(new Talon(2)).setInverted(true),
-        		BLDriveEncoder, /*max rot rate*/ 0, /*kP*/0, /*kI*/0, /*kD*/0);
+        		BLDriveEncoder, MAX_DRIVETRAIN_RATE, MAX_DRIVETRAIN_RATE/16, /*kI*/0, /*kD*/0);
         
         final Encoder BRDriveEncoder = new Encoder(10, 11);
         final VelocityController BRDriveController = new VelocityController(new Drivetrain(new Talon(3)),
-        		BRDriveEncoder, /*max rot rate*/ 0, /*kP*/0, /*kI*/0, /*kD*/0);
+        		BRDriveEncoder, MAX_DRIVETRAIN_RATE, MAX_DRIVETRAIN_RATE/16, /*kI*/0, /*kD*/0);
         
         final Gyro driveGyro = new Gyro(0);
 		this.drivetrain = new RobotDrivetrain(
@@ -65,12 +67,12 @@ public class Robot extends TitanBot {
                 );
         
         final Encoder leftElevatorEncoder = new Encoder(8, 9);
-        final VelocityController leftElevatorController = new VelocityController(new Drivetrain(new Talon(4)),
-        		leftElevatorEncoder, /*max rot rate*/ 0, /*kP*/0, /*kI*/0, /*kD*/0);
+        final VelocityController leftElevatorController = new VelocityController(new Drivetrain(new Talon(4)).setInverted(false),
+        		leftElevatorEncoder, MAX_ELEVATOR_RATE, MAX_ELEVATOR_RATE/6, /*kI*/0, /*kD*/0);
         
         final Encoder rightElevatorEncoder = new Encoder (14, 15);
-        final VelocityController rightElevatorController = new VelocityController(new Drivetrain(new Talon(5)).setInverted(true),
-        		rightElevatorEncoder, /*max rot rate*/ 0, /*kP*/0, /*kI*/0, /*kD*/0);
+        final VelocityController rightElevatorController = new VelocityController(new Drivetrain(new Talon(5)).setInverted(false),
+        		rightElevatorEncoder, MAX_ELEVATOR_RATE, MAX_ELEVATOR_RATE/6, /*kI*/0, /*kD*/0);
         
         this.toteElevator = new ToteElevator(
                 leftElevatorController,
@@ -109,9 +111,9 @@ public class Robot extends TitanBot {
 
     @Override
     public void robotInit() {
-        gamepad.bind(LogitechButton.A, toteElevator::advanceElevatorCommand);
+        gamepad.bind(LogitechButton.A, PressType.HOLD, toteElevator::advanceElevatorCommand);
         gamepad.bind(LogitechButton.A, PressType.RELEASE, toteElevator::stopElevatorCommand);
-        gamepad.bind(LogitechButton.B, toteElevator::retreatElevatorCommand);
+        gamepad.bind(LogitechButton.B, PressType.HOLD, toteElevator::retreatElevatorCommand);
         gamepad.bind(LogitechButton.B, PressType.RELEASE, toteElevator::stopElevatorCommand);
         gamepad.bind(LogitechButton.RIGHT_TRIGGER, PressType.PRESS, toteElevator::startIntakeCommand);
         gamepad.bind(LogitechButton.RIGHT_TRIGGER, PressType.RELEASE, toteElevator::stopIntakeCommand);
@@ -145,7 +147,7 @@ public class Robot extends TitanBot {
     @Override
     public void teleopInit() {
         gamepad.enableBindings();
-        drivetrain.start();
+//        drivetrain.start();
         toteElevator.start();
         binElevator.start();
         

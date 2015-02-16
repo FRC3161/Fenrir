@@ -4,10 +4,6 @@
 	<classpathentry kind="var" path="wpilib" sourcepath="wpilib.sources"/>
 	<classpathentry kind="var" path="networktables" sourcepath="networktables.sources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/Yggdrasil-v0.11.0-RELEASE.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="http://cloud.team3161.ca/download/yggdrasil/latest/javadoc"/>
-		</attributes>
-	</classpathentry>
+	<classpathentry kind="lib" path="lib/Yggdrasil-v0.11.1-RELEASE.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -16,6 +16,7 @@ public class ToteElevator extends RepeatingIndependentSubsystem {
                 elevatorControllers, intakeControllers;
     private final Encoder leftEncoder, rightEncoder;
     private final Solenoid solenoid;
+    private volatile float pidTarget = 0;
 
     public ToteElevator(final SpeedController leftElevator, final SpeedController rightElevator,
             final SpeedController leftIntake, final SpeedController rightIntake,
@@ -43,14 +44,6 @@ public class ToteElevator extends RepeatingIndependentSubsystem {
         require(leftEncoder);
     }
 
-    private void setElevator(final double rate) {
-        elevatorControllers.set(rate);
-    }
-
-    private void stopElevator() {
-        setElevator(0);
-    }
-
     private void setIntake(final double rate) {
         intakeControllers.set(rate);
     }
@@ -59,24 +52,16 @@ public class ToteElevator extends RepeatingIndependentSubsystem {
         setIntake(0);
     }
 
-    private void waitAndStopElevator() {
-        try {
-            Thread.sleep(500);
-        } catch (final InterruptedException ie) {
-        }
-        stopElevator();
-    }
-
     public void advanceElevatorCommand() {
-        setElevator(INTAKE_MOTOR_PWM);
+        pidTarget = 1;
     }
 
     public void retreatElevatorCommand() {
-        setElevator(-INTAKE_MOTOR_PWM);
+        pidTarget = -1;
     }
 
     public void stopElevatorCommand() {
-        stopElevator();
+        pidTarget = 0;
     }
 
     public void startIntakeCommand() {
@@ -97,7 +82,7 @@ public class ToteElevator extends RepeatingIndependentSubsystem {
 
     @Override
     public void task() {
-        // TODO: implement PIDs, use this to loop them
+        elevatorControllers.set(pidTarget);
     }
 
 }
