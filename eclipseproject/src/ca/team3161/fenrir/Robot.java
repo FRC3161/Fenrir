@@ -11,14 +11,15 @@ import ca.team3161.lib.robot.pid.VelocityController;
 import ca.team3161.lib.utils.controls.Gamepad;
 import ca.team3161.lib.utils.controls.Gamepad.PressType;
 import ca.team3161.lib.utils.controls.LogitechDualAction;
+import ca.team3161.lib.utils.controls.LogitechDualAction.LogitechAxis;
 import ca.team3161.lib.utils.controls.LogitechDualAction.LogitechButton;
-import edu.wpi.first.wpilibj.CameraServer;
+import ca.team3161.lib.utils.controls.LogitechDualAction.LogitechControl;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Gyro;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Talon;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends TitanBot {
@@ -30,12 +31,12 @@ public class Robot extends TitanBot {
     private final ToteElevator toteElevator;
     private final BinElevator binElevator;
     private final EncoderMonitor encoderMonitor;
-    private Preferences prefs = Preferences.getInstance();
-    private DigitalInput photoswitch = new DigitalInput(19);
-    
+    private final Preferences prefs = Preferences.getInstance();
+    private final DigitalInput photoswitch = new DigitalInput(19);
+
     public Robot() {
         this.gamepad = new LogitechDualAction(0);
-        
+
         final Encoder FLDriveEncoder = new Encoder(0, 1);
         final VelocityController FLDriveController = new VelocityController(new Drivetrain(new Talon(0)).setInverted(true),
         		FLDriveEncoder, MAX_DRIVETRAIN_RATE, MAX_DRIVETRAIN_RATE/16, /*kI*/0, /*kD*/0);
@@ -51,9 +52,9 @@ public class Robot extends TitanBot {
         final Encoder BRDriveEncoder = new Encoder(10, 11);
         final VelocityController BRDriveController = new VelocityController(new Drivetrain(new Talon(3)),
         		BRDriveEncoder, MAX_DRIVETRAIN_RATE, MAX_DRIVETRAIN_RATE/16, /*kI*/0, /*kD*/0);
-        
+
         final Gyro driveGyro = new Gyro(0);
-		this.drivetrain = new RobotDrivetrain(
+        this.drivetrain = new RobotDrivetrain(
                 gamepad,
                 FLDriveController,
                 FRDriveController,
@@ -65,7 +66,7 @@ public class Robot extends TitanBot {
                 BRDriveEncoder,
                 driveGyro
                 );
-        
+
         final Encoder leftElevatorEncoder = new Encoder(8, 9);
         final VelocityController leftElevatorController = new VelocityController(new Drivetrain(new Talon(4)).setInverted(false),
         		leftElevatorEncoder, MAX_ELEVATOR_RATE, MAX_ELEVATOR_RATE/6, /*kI*/0, /*kD*/0);
@@ -88,7 +89,7 @@ public class Robot extends TitanBot {
                 new Encoder(12, 13),
                 new Solenoid(0)
                 );
-        
+
         final Set<LabelledEncoder> labelledEncoders = new HashSet<>();
         labelledEncoders.add(new LabelledEncoder("FLDE", FLDriveEncoder));
         labelledEncoders.add(new LabelledEncoder("FRDE", FRDriveEncoder));
@@ -99,9 +100,9 @@ public class Robot extends TitanBot {
 
     @Override
     public void autonomousRoutine() throws Exception {
-    	SmartDashboard.putString("Mode", "Auto Running");
-    	
-    	SmartDashboard.putString("Mode", "Auto Complete");
+        SmartDashboard.putString("Mode", "Auto Running");
+
+        SmartDashboard.putString("Mode", "Auto Complete");
     }
 
     @Override
@@ -111,7 +112,11 @@ public class Robot extends TitanBot {
 
     @Override
     public void robotInit() {
-        gamepad.bind(LogitechButton.A, PressType.HOLD, toteElevator::advanceElevatorCommand);
+        for (final LogitechControl control : LogitechControl.values()) {
+            for (final LogitechAxis axis : LogitechAxis.values()) {
+                gamepad.setMode(control, axis, d -> Math.abs(d) < 0.1 ? 0 : d); // deadband around [-0.1, 0.1]
+            }
+        }
         gamepad.bind(LogitechButton.A, PressType.RELEASE, toteElevator::stopElevatorCommand);
         gamepad.bind(LogitechButton.B, PressType.HOLD, toteElevator::retreatElevatorCommand);
         gamepad.bind(LogitechButton.B, PressType.RELEASE, toteElevator::stopElevatorCommand);
@@ -126,11 +131,11 @@ public class Robot extends TitanBot {
         gamepad.bind(LogitechButton.Y, PressType.RELEASE, binElevator::stopCommand);
         gamepad.bind(LogitechButton.LEFT_TRIGGER, binElevator::deployClawCommand);
         gamepad.bind(LogitechButton.LEFT_BUMPER, binElevator::retractClawCommand);
-        
+
         SmartDashboard.putString("Mode", "On");
-        
-//        CameraServer.getInstance().startAutomaticCapture();
-        
+
+        //        CameraServer.getInstance().startAutomaticCapture();
+
         encoderMonitor.start();
     }
 
@@ -140,7 +145,7 @@ public class Robot extends TitanBot {
         drivetrain.cancel();
         toteElevator.cancel();
         binElevator.cancel();
-        
+
         SmartDashboard.putString("Mode", "Disabled");
     }
 
@@ -150,7 +155,7 @@ public class Robot extends TitanBot {
 //        drivetrain.start();
         toteElevator.start();
         binElevator.start();
-        
+
         SmartDashboard.putString("Mode", "Teleop Enabled");
     }
 
