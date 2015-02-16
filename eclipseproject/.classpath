@@ -4,6 +4,6 @@
 	<classpathentry kind="var" path="wpilib" sourcepath="wpilib.sources"/>
 	<classpathentry kind="var" path="networktables" sourcepath="networktables.sources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/Yggdrasil-v0.11.1-RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/Yggdrasil-20150216-1733.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
