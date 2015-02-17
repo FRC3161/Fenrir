@@ -77,11 +77,11 @@ public class ToteElevator extends RepeatingIndependentSubsystem {
     }
 
     private void openClaws() {
-        solenoid.set(false);
+        solenoid.set(true);
     }
 
     private void closeClaws() {
-        solenoid.set(true);
+        solenoid.set(false);
     }
 
     @Override

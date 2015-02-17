@@ -165,10 +165,10 @@ public class Robot extends TitanBot {
         toteElevator.start();
         binElevator.start();
         
-        ((RampingSpeedController)drivetrain.getFLController()).prevTarget = 0;
-        ((RampingSpeedController)drivetrain.getFRController()).prevTarget = 0;
-        ((RampingSpeedController)drivetrain.getBLController()).prevTarget = 0;
-        ((RampingSpeedController)drivetrain.getBRController()).prevTarget = 0;
+//        ((RampingSpeedController)drivetrain.getFLController()).prevTarget = 0;
+//        ((RampingSpeedController)drivetrain.getFRController()).prevTarget = 0;
+//        ((RampingSpeedController)drivetrain.getBLController()).prevTarget = 0;
+//        ((RampingSpeedController)drivetrain.getBRController()).prevTarget = 0;
     }
 
     @Override
