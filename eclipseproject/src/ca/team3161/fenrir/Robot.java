@@ -76,7 +76,7 @@ public class Robot extends TitanBot {
         final float kD = 0;
         final float maxI = 4000;
         final float deadband = 150;
-        final double maxStep = 0.01;
+        final double maxStep = 0.03;
         final Encoder FLDriveEncoder = new Encoder(0, 1);
         final SpeedController FLDriveController = getDriveController(new Talon(0), true, kP, kI, kD, FLDriveEncoder, MAX_DRIVETRAIN_RATE, maxI, deadband, maxStep);
         
@@ -108,8 +108,13 @@ public class Robot extends TitanBot {
     		final float kP, final float kI, final float kD,
     		final Encoder encoder,
     		final int maxRate, final float maxI, final float deadband, final double maxStep) {
-    	return new RampingSpeedController(new VelocityController(new Drivetrain(baseController).setInverted(inverted),
-        		encoder, maxRate, kP, kI, kD, maxI, deadband), maxStep);
+    	return new RampingSpeedController(
+	    			new VelocityController(
+		    			new Drivetrain(
+		    					new RampingSpeedController(baseController, maxStep))
+		    			.setInverted(inverted),
+	        		encoder, maxRate, kP, kI, kD, maxI, deadband),
+        		maxStep);
     }
 
     @Override
