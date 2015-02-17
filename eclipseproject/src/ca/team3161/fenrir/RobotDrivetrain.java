@@ -57,13 +57,14 @@ public class RobotDrivetrain extends RepeatingIndependentSubsystem {
                 gamepad.getValue(LogitechControl.LEFT_STICK, LogitechAxis.X),
                 gamepad.getValue(LogitechControl.LEFT_STICK, LogitechAxis.Y),
                 gamepad.getValue(LogitechControl.RIGHT_STICK, LogitechAxis.X),
-                gyro.getAngle()
+//                gyro.getAngle()
+                0
                 );
     }
 
     @Override
     public void task() {
-//        drive();
+        drive();
     }
     
     public Encoder getFLEncoder () {
@@ -80,6 +81,22 @@ public class RobotDrivetrain extends RepeatingIndependentSubsystem {
     
     public Encoder getBREncoder () {
     	return backRightEncoder;
+    }
+    
+    public SpeedController getFLController() {
+    	return frontLeft;
+    }
+    
+    public SpeedController getFRController() {
+    	return frontRight;
+    }
+    
+    public SpeedController getBLController() {
+    	return backLeft;
+    }
+    
+    public SpeedController getBRController() {
+    	return backRight;
     }
 
 }

@@ -13,7 +13,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class ToteElevator extends RepeatingIndependentSubsystem {
 
-    private static final double INTAKE_MOTOR_PWM = 0.3;
+    private static final float ELEVATOR_RATE = 0.85f;
+	private static final double INTAKE_MOTOR_PWM = 0.65;
     private final VelocityController leftElevator, rightElevator;
 	private final SpeedController leftIntake, rightIntake, intakeControllers;
     private final Encoder leftEncoder, rightEncoder;
@@ -54,11 +55,11 @@ public class ToteElevator extends RepeatingIndependentSubsystem {
     }
 
     public void advanceElevatorCommand() {
-        pidTarget = 0.5f;
+        pidTarget = ELEVATOR_RATE;
     }
 
     public void retreatElevatorCommand() {
-        pidTarget = -0.5f;
+        pidTarget = -ELEVATOR_RATE;
     }
 
     public void stopElevatorCommand() {
@@ -87,13 +88,8 @@ public class ToteElevator extends RepeatingIndependentSubsystem {
     public void task() {
     	final float leftPid = leftElevator.pid(pidTarget * Robot.MAX_ELEVATOR_RATE);
     	final float rightPid = rightElevator.pid(pidTarget * Robot.MAX_ELEVATOR_RATE);
-    	SmartDashboard.putNumber("Left PID", leftPid);
-    	SmartDashboard.putNumber("Right PID", rightPid);
     	leftElevator.getSpeedController().set(leftPid);
     	rightElevator.getSpeedController().set(rightPid);
-    	SmartDashboard.putNumber("left error", (pidTarget * Robot.MAX_ELEVATOR_RATE) - leftElevator.getRate());
-    	
-    	SmartDashboard.putNumber("Elev PID target", pidTarget);
     }
     
     public Encoder getLeftEncoder() {

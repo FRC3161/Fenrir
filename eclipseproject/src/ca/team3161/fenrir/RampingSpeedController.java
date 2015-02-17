@@ -11,6 +11,7 @@ public class RampingSpeedController implements SpeedController {
 
     private final SpeedController controller;
     private final double maxStep;
+    double prevTarget = 0;
 
     public RampingSpeedController(final SpeedController controller, final double maxStep) {
         Assert.assertTrue("Maximum step size cannot be less than -1 or greater than 1", Math.abs(maxStep) <= 1);
@@ -44,12 +45,20 @@ public class RampingSpeedController implements SpeedController {
         controller.disable();
     }
 
-    private double adjust(final double target) {
+    private double adjust(double target) {
         final double error = target - get();
+        if (Math.abs(target) < 0.05) {
+        	if (target - prevTarget > 10*maxStep) {
+        		target = prevTarget + 10*maxStep;
+        	} else if (target - prevTarget < -10*maxStep) {
+        		target = prevTarget - 10*maxStep;
+        	}
+        }
+        prevTarget = target;
         if (error > maxStep) {
-            return maxStep;
+            return get() + maxStep;
         } else if (error < -maxStep) {
-            return -maxStep;
+            return get() - maxStep;
         } else {
             return target;
         }
