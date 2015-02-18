@@ -3,6 +3,7 @@ package ca.team3161.fenrir;
 import java.util.concurrent.TimeUnit;
 
 import ca.team3161.lib.robot.subsystem.RepeatingIndependentSubsystem;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedController;
@@ -10,15 +11,20 @@ import edu.wpi.first.wpilibj.SpeedController;
 public class BinElevator extends RepeatingIndependentSubsystem {
 
     private static final double MOTOR_PWM = 0.75;
+    private volatile double pwmTarget = 0;
 	private final SpeedController controller;
     private final Solenoid solenoid;
     private final Encoder encoder;
+    private final DigitalInput bottomLimitSwitch, topLimitSwitch;
 
-    public BinElevator(final SpeedController controller, final Encoder encoder, final Solenoid solenoid) {
+    public BinElevator(final SpeedController controller, final Encoder encoder, final Solenoid solenoid,
+    		final DigitalInput bottomLimitSwitch, final DigitalInput topLimitSwitch) {
         super(50, TimeUnit.MILLISECONDS);
         this.controller = controller;
         this.solenoid = solenoid;
         this.encoder = encoder;
+        this.bottomLimitSwitch = bottomLimitSwitch;
+        this.topLimitSwitch = topLimitSwitch;
     }
 
     @Override
@@ -29,19 +35,11 @@ public class BinElevator extends RepeatingIndependentSubsystem {
     }
 
     private void set(final double rate) {
-        controller.set(rate);
+        pwmTarget = rate;
     }
 
     private void stop() {
         set(0);
-    }
-
-    private void waitAndStop() {
-        try {
-            Thread.sleep(500);
-        } catch (final InterruptedException ie) {
-        }
-        stop();
     }
 
     public void advanceCommand() {
@@ -66,7 +64,14 @@ public class BinElevator extends RepeatingIndependentSubsystem {
 
     @Override
     public void task() {
-        // TODO: implements PIDs, use this to loop them
+    	final boolean bottomSwitch = !bottomLimitSwitch.get(), topSwitch = !topLimitSwitch.get();
+        if (pwmTarget > 0 && topSwitch) {
+        	stop();
+        } else if (pwmTarget < 0 && bottomSwitch) {
+        	stop();
+        } else {
+        	controller.set(pwmTarget);
+        }
     }
 
 }

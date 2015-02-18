@@ -56,7 +56,7 @@ public class RampingSpeedController implements SpeedController {
 //        }
 //        prevTarget = target;
         if (Math.abs(target) <= 0.05) {
-        	return 0;
+        	return target;
         }
         if (error > maxStep) {
             return get() + maxStep;

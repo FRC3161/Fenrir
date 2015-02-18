@@ -41,7 +41,9 @@ public class Robot extends TitanBot {
 		this.binElevator = new BinElevator(
                 new Drivetrain(new Talon(8)).setInverted(true),
                 new Encoder(12, 13),
-                new Solenoid(0)
+                new Solenoid(0),
+                new DigitalInput(17),
+                new DigitalInput(18)
                 );
 	}
 
@@ -110,8 +112,7 @@ public class Robot extends TitanBot {
     		final int maxRate, final float maxI, final float deadband, final double maxStep) {
     	return new RampingSpeedController(
 	    			new VelocityController(
-		    			new Drivetrain(
-		    					new RampingSpeedController(baseController, maxStep))
+		    			new Drivetrain(baseController)
 		    			.setInverted(inverted),
 	        		encoder, maxRate, kP, kI, kD, maxI, deadband),
         		maxStep);
