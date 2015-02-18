@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 import ca.team3161.lib.robot.Drivetrain;
 import ca.team3161.lib.robot.TitanBot;
 import ca.team3161.lib.robot.pid.VelocityController;
+import ca.team3161.lib.utils.controls.DeadbandJoystickMode;
 import ca.team3161.lib.utils.controls.Gamepad;
 import ca.team3161.lib.utils.controls.Gamepad.PressType;
 import ca.team3161.lib.utils.controls.LogitechDualAction;
@@ -134,7 +135,7 @@ public class Robot extends TitanBot {
     public void robotInit() {
         for (final LogitechControl control : LogitechControl.values()) {
             for (final LogitechAxis axis : LogitechAxis.values()) {
-                gamepad.setMode(control, axis, d -> Math.abs(d) < 0.05 ? 0 : d); // deadband around [-0.05, 0.05]
+                gamepad.setMode(control, axis, new DeadbandJoystickMode(0.05));
             }
         }
         gamepad.bind(LogitechButton.A, PressType.PRESS, toteElevator::advanceElevatorCommand);
