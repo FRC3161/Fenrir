@@ -19,7 +19,7 @@ public class BinElevator extends RepeatingIndependentSubsystem {
 
     public BinElevator(final SpeedController controller, final Encoder encoder, final Solenoid solenoid,
     		final DigitalInput bottomLimitSwitch, final DigitalInput topLimitSwitch) {
-        super(50, TimeUnit.MILLISECONDS);
+        super(10, TimeUnit.MILLISECONDS);
         this.controller = controller;
         this.solenoid = solenoid;
         this.encoder = encoder;

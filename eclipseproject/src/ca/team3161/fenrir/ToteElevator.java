@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 import ca.team3161.lib.robot.Drivetrain;
 import ca.team3161.lib.robot.pid.VelocityController;
 import ca.team3161.lib.robot.subsystem.RepeatingIndependentSubsystem;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedController;
@@ -13,19 +14,23 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class ToteElevator extends RepeatingIndependentSubsystem {
 
-    private static final float ELEVATOR_RATE = 0.85f;
+    private static final float ELEVATOR_RATE = 0.9f;
 	private static final double INTAKE_MOTOR_PWM = 0.65;
     private final VelocityController leftElevator, rightElevator;
 	private final SpeedController leftIntake, rightIntake, intakeControllers;
     private final Encoder leftEncoder, rightEncoder;
     private final Solenoid solenoid;
-    private volatile float pidTarget = 0;
+    private final DigitalInput leftPhotoGate, rightPhotoGate;
+    private volatile int leftHookCountTarget = 0, rightHookCountTarget;
+    private volatile int leftHookCount = 0, rightHookCount = 0, leftEncoderTicks = 0, rightEncoderTicks = 0;
+    private volatile float leftPidTarget = 0, rightPidTarget = 0;
 
     public ToteElevator(final VelocityController leftElevator, final VelocityController rightElevator,
             final SpeedController leftIntake, final SpeedController rightIntake,
             final Encoder leftEncoder, final Encoder rightEncoder,
+            final DigitalInput leftPhotoGate, final DigitalInput rightPhotoGate,
             final Solenoid solenoid) {
-        super(20, TimeUnit.MILLISECONDS);
+        super(5, TimeUnit.MILLISECONDS);
         this.leftElevator = leftElevator;
         this.rightElevator = rightElevator;
         this.leftIntake = leftIntake;
@@ -33,6 +38,8 @@ public class ToteElevator extends RepeatingIndependentSubsystem {
         this.intakeControllers = new Drivetrain(leftIntake, rightIntake);
         this.leftEncoder = leftEncoder;
         this.rightEncoder = rightEncoder;
+        this.leftPhotoGate = leftPhotoGate;
+        this.rightPhotoGate = rightPhotoGate;
         this.solenoid = solenoid;
     }
 
@@ -42,8 +49,7 @@ public class ToteElevator extends RepeatingIndependentSubsystem {
         require(rightElevator);
         require(leftIntake);
         require(rightIntake);
-        require(rightEncoder);
-        require(leftEncoder);
+        require(solenoid);
     }
 
     private void setIntake(final double rate) {
@@ -55,15 +61,34 @@ public class ToteElevator extends RepeatingIndependentSubsystem {
     }
 
     public void advanceElevatorCommand() {
-        pidTarget = ELEVATOR_RATE;
+        leftPidTarget = ELEVATOR_RATE;
+        rightPidTarget = ELEVATOR_RATE;
+        leftEncoderTicks = getLeftEncoder().get();
+        rightEncoderTicks = getRightEncoder().get();
+        leftHookCountTarget++;
+        rightHookCountTarget++;
     }
 
     public void retreatElevatorCommand() {
-        pidTarget = -ELEVATOR_RATE;
+        leftPidTarget = -ELEVATOR_RATE;
+        rightPidTarget = -ELEVATOR_RATE;
+        leftEncoderTicks = getLeftEncoder().get();
+        rightEncoderTicks = getRightEncoder().get();
+        leftHookCountTarget++;
+        rightHookCountTarget++;
     }
 
     public void stopElevatorCommand() {
-        pidTarget = 0;
+        stopLeftElevator();
+        stopRightElevator();
+    }
+    
+    public void stopLeftElevator() {
+    	leftPidTarget = 0;
+    }
+    
+    public void stopRightElevator() {
+    	rightPidTarget = 0;
     }
 
     public void startIntakeCommand() {
@@ -86,10 +111,24 @@ public class ToteElevator extends RepeatingIndependentSubsystem {
 
     @Override
     public void task() {
-    	final float leftPid = leftElevator.pid(pidTarget * Robot.MAX_ELEVATOR_RATE);
-    	final float rightPid = rightElevator.pid(pidTarget * Robot.MAX_ELEVATOR_RATE);
-    	leftElevator.getSpeedController().set(leftPid);
-    	rightElevator.getSpeedController().set(rightPid);
+    	leftElevator.set(leftPidTarget);
+    	rightElevator.set(rightPidTarget);
+    	SmartDashboard.putNumber("left elev enc", getLeftEncoder().get());
+    	SmartDashboard.putNumber("right elev enc", getRightEncoder().get());
+    	if (!leftPhotoGate.get() && (leftEncoder.get() > leftEncoderTicks + 100 || leftEncoder.get() < leftEncoderTicks - 100)) {
+    		leftHookCount++;
+    	}
+    	if (!rightPhotoGate.get() && (rightEncoder.get() > rightEncoderTicks + 100 || rightEncoder.get() < rightEncoderTicks - 100)) {
+    		rightHookCount++;
+    	}
+    	if (leftHookCount >= leftHookCountTarget) {
+    		leftHookCount = leftHookCountTarget;
+    		stopLeftElevator();
+    	}
+    	if (rightHookCount >= rightHookCountTarget) {
+    		rightHookCount = rightHookCountTarget;
+    		stopRightElevator();
+    	}
     }
     
     public Encoder getLeftEncoder() {

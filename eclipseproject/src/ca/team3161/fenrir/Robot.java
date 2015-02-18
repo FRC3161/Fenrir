@@ -27,7 +27,6 @@ public class Robot extends TitanBot {
     private ToteElevator toteElevator;
     private BinElevator binElevator;
     private final Preferences prefs = Preferences.getInstance();
-    private final DigitalInput photoswitch = new DigitalInput(19);
 
     public Robot() {
         this.gamepad = new LogitechDualAction(0);
@@ -68,6 +67,8 @@ public class Robot extends TitanBot {
                 new Drivetrain(new Talon(7)).setInverted(true), 	//right intake
                 leftElevatorEncoder,
                 rightElevatorEncoder,
+                new DigitalInput(19),
+                new DigitalInput(20),
                 new Solenoid(1)
                 );
 	}
@@ -78,7 +79,7 @@ public class Robot extends TitanBot {
         final float kD = 0;
         final float maxI = 4000;
         final float deadband = 150;
-        final double maxStep = 0.03;
+        final double maxStep = 0.01;
         final Encoder FLDriveEncoder = new Encoder(0, 1);
         final SpeedController FLDriveController = getDriveController(new Talon(0), true, kP, kI, kD, FLDriveEncoder, MAX_DRIVETRAIN_RATE, maxI, deadband, maxStep);
         
@@ -135,9 +136,9 @@ public class Robot extends TitanBot {
             }
         }
         gamepad.bind(LogitechButton.A, PressType.PRESS, toteElevator::advanceElevatorCommand);
-        gamepad.bind(LogitechButton.A, PressType.RELEASE, toteElevator::stopElevatorCommand);
+//        gamepad.bind(LogitechButton.A, PressType.RELEASE, toteElevator::stopElevatorCommand);
         gamepad.bind(LogitechButton.B, PressType.PRESS, toteElevator::retreatElevatorCommand);
-        gamepad.bind(LogitechButton.B, PressType.RELEASE, toteElevator::stopElevatorCommand);
+//        gamepad.bind(LogitechButton.B, PressType.RELEASE, toteElevator::stopElevatorCommand);
         gamepad.bind(LogitechButton.RIGHT_TRIGGER, PressType.PRESS, toteElevator::startIntakeCommand);
         gamepad.bind(LogitechButton.RIGHT_TRIGGER, PressType.RELEASE, toteElevator::stopIntakeCommand);
 
