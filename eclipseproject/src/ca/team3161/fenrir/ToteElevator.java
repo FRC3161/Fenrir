@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit;
 
 import ca.team3161.lib.robot.Drivetrain;
 import ca.team3161.lib.robot.pid.VelocityController;
-import ca.team3161.lib.robot.subsystem.RepeatingIndependentSubsystem;
+import ca.team3161.lib.robot.subsystem.RepeatingPooledSubsystem;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
-public class ToteElevator extends RepeatingIndependentSubsystem {
+public class ToteElevator extends RepeatingPooledSubsystem {
 
     private static final int TOTE_ENCODER_OVERSHOOT_TICKS = 100;
     private static final float ELEVATOR_RATE = 0.9f;
@@ -83,11 +83,11 @@ public class ToteElevator extends RepeatingIndependentSubsystem {
         stopLeftElevator();
         stopRightElevator();
     }
-    
+
     public void stopLeftElevator() {
     	leftPidTarget = 0;
     }
-    
+
     public void stopRightElevator() {
     	rightPidTarget = 0;
     }
@@ -131,11 +131,11 @@ public class ToteElevator extends RepeatingIndependentSubsystem {
     		stopRightElevator();
     	}
     }
-    
+
     public Encoder getLeftEncoder() {
     	return leftEncoder;
     }
-    
+
     public Encoder getRightEncoder() {
     	return rightEncoder;
     }

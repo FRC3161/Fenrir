@@ -2,13 +2,13 @@ package ca.team3161.fenrir;
 
 import java.util.concurrent.TimeUnit;
 
-import ca.team3161.lib.robot.subsystem.RepeatingIndependentSubsystem;
+import ca.team3161.lib.robot.subsystem.RepeatingPooledSubsystem;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedController;
 
-public class BinElevator extends RepeatingIndependentSubsystem {
+public class BinElevator extends RepeatingPooledSubsystem {
 
     private static final double MOTOR_PWM = 0.75;
     private volatile double pwmTarget = 0;

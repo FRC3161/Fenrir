@@ -2,7 +2,7 @@ package ca.team3161.fenrir;
 
 import java.util.concurrent.TimeUnit;
 
-import ca.team3161.lib.robot.subsystem.RepeatingIndependentSubsystem;
+import ca.team3161.lib.robot.subsystem.RepeatingPooledSubsystem;
 import ca.team3161.lib.utils.controls.Gamepad;
 import ca.team3161.lib.utils.controls.LogitechDualAction.LogitechAxis;
 import ca.team3161.lib.utils.controls.LogitechDualAction.LogitechControl;
@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.Gyro;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SpeedController;
 
-public class RobotDrivetrain extends RepeatingIndependentSubsystem {
+public class RobotDrivetrain extends RepeatingPooledSubsystem {
 
     private final Gamepad gamepad;
     private final Gyro gyro;
@@ -66,35 +66,35 @@ public class RobotDrivetrain extends RepeatingIndependentSubsystem {
     public void task() {
         drive();
     }
-    
+
     public Encoder getFLEncoder () {
     	return frontLeftEncoder;
     }
-    
+
     public Encoder getFREncoder () {
     	return frontRightEncoder;
     }
-    
+
     public Encoder getBLEncoder () {
     	return backLeftEncoder;
     }
-    
+
     public Encoder getBREncoder () {
     	return backRightEncoder;
     }
-    
+
     public SpeedController getFLController() {
     	return frontLeft;
     }
-    
+
     public SpeedController getFRController() {
     	return frontRight;
     }
-    
+
     public SpeedController getBLController() {
     	return backLeft;
     }
-    
+
     public SpeedController getBRController() {
     	return backRight;
     }
