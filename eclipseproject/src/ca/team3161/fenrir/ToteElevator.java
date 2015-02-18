@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class ToteElevator extends RepeatingIndependentSubsystem {
 
+    private static final int TOTE_ENCODER_OVERSHOOT_TICKS = 100;
     private static final float ELEVATOR_RATE = 0.9f;
 	private static final double INTAKE_MOTOR_PWM = 0.65;
     private final VelocityController leftElevator, rightElevator;
@@ -115,10 +116,10 @@ public class ToteElevator extends RepeatingIndependentSubsystem {
     	rightElevator.set(rightPidTarget);
     	SmartDashboard.putNumber("left elev enc", getLeftEncoder().get());
     	SmartDashboard.putNumber("right elev enc", getRightEncoder().get());
-    	if (!leftPhotoGate.get() && (leftEncoder.get() > leftEncoderTicks + 100 || leftEncoder.get() < leftEncoderTicks - 100)) {
+    	if (!leftPhotoGate.get() && (leftEncoder.get() > leftEncoderTicks + TOTE_ENCODER_OVERSHOOT_TICKS || leftEncoder.get() < leftEncoderTicks - TOTE_ENCODER_OVERSHOOT_TICKS)) {
     		leftHookCount++;
     	}
-    	if (!rightPhotoGate.get() && (rightEncoder.get() > rightEncoderTicks + 100 || rightEncoder.get() < rightEncoderTicks - 100)) {
+    	if (!rightPhotoGate.get() && (rightEncoder.get() > rightEncoderTicks + TOTE_ENCODER_OVERSHOOT_TICKS || rightEncoder.get() < rightEncoderTicks - TOTE_ENCODER_OVERSHOOT_TICKS)) {
     		rightHookCount++;
     	}
     	if (leftHookCount >= leftHookCountTarget) {

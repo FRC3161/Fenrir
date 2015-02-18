@@ -4,6 +4,10 @@
 	<classpathentry kind="var" path="wpilib" sourcepath="wpilib.sources"/>
 	<classpathentry kind="var" path="networktables" sourcepath="networktables.sources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/Yggdrasil-20150216-1733.jar"/>
+	<classpathentry kind="lib" path="lib/Yggdrasil-v0.13.0-RELEASE.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/Fenrir/lib/Yggdrasil-v0.13.0-RELEASE-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

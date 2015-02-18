@@ -1,6 +1,8 @@
 
 package ca.team3161.fenrir;
 
+import java.util.concurrent.TimeUnit;
+
 import ca.team3161.lib.robot.Drivetrain;
 import ca.team3161.lib.robot.TitanBot;
 import ca.team3161.lib.robot.pid.VelocityController;
@@ -29,7 +31,7 @@ public class Robot extends TitanBot {
     private final Preferences prefs = Preferences.getInstance();
 
     public Robot() {
-        this.gamepad = new LogitechDualAction(0);
+        this.gamepad = new LogitechDualAction(0, 10, TimeUnit.MILLISECONDS);
 
         setupDrivetrain();
         setupToteElevator();
@@ -55,11 +57,11 @@ public class Robot extends TitanBot {
 		final Encoder leftElevatorEncoder = new Encoder(8, 9);
         final VelocityController leftElevatorController = new VelocityController(new Drivetrain(new Talon(4)).setInverted(false),
         		leftElevatorEncoder, MAX_ELEVATOR_RATE, kP, kI, kD, maxI, deadband);
-        
+
         final Encoder rightElevatorEncoder = new Encoder (15, 14);
         final VelocityController rightElevatorController = new VelocityController(new Drivetrain(new Talon(5)).setInverted(true),
         		rightElevatorEncoder, MAX_ELEVATOR_RATE, kP, kI, kD, maxI, deadband);
-        
+
         this.toteElevator = new ToteElevator(
                 leftElevatorController,
                 rightElevatorController,
@@ -82,13 +84,13 @@ public class Robot extends TitanBot {
         final double maxStep = 0.01;
         final Encoder FLDriveEncoder = new Encoder(0, 1);
         final SpeedController FLDriveController = getDriveController(new Talon(0), true, kP, kI, kD, FLDriveEncoder, MAX_DRIVETRAIN_RATE, maxI, deadband, maxStep);
-        
+
         final Encoder FRDriveEncoder = new Encoder(3, 2);
         final SpeedController FRDriveController = getDriveController(new Talon(1), false, kP, kI, kD, FRDriveEncoder, MAX_DRIVETRAIN_RATE, maxI, deadband, maxStep);
-        
+
         final Encoder BLDriveEncoder = new Encoder(4, 5);
         final SpeedController BLDriveController = getDriveController(new Talon(2), true, kP, kI, kD, BLDriveEncoder, MAX_DRIVETRAIN_RATE, maxI, deadband, maxStep);
-        
+
         final Encoder BRDriveEncoder = new Encoder(11, 10);
         final SpeedController BRDriveController = getDriveController(new Talon(3), false, kP, kI, kD, BRDriveEncoder, MAX_DRIVETRAIN_RATE, maxI, deadband, maxStep);
 
@@ -106,7 +108,7 @@ public class Robot extends TitanBot {
                 driveGyro
                 );
 	}
-    
+
     public static SpeedController getDriveController(final SpeedController baseController, final boolean inverted,
     		final float kP, final float kI, final float kD,
     		final Encoder encoder,
@@ -132,7 +134,7 @@ public class Robot extends TitanBot {
     public void robotInit() {
         for (final LogitechControl control : LogitechControl.values()) {
             for (final LogitechAxis axis : LogitechAxis.values()) {
-                gamepad.setMode(control, axis, d -> Math.abs(d) < 0.05 ? 0 : d); // deadband around [-0.1, 0.1]
+                gamepad.setMode(control, axis, d -> Math.abs(d) < 0.05 ? 0 : d); // deadband around [-0.05, 0.05]
             }
         }
         gamepad.bind(LogitechButton.A, PressType.PRESS, toteElevator::advanceElevatorCommand);
@@ -166,7 +168,7 @@ public class Robot extends TitanBot {
         drivetrain.start();
         toteElevator.start();
         binElevator.start();
-        
+
 //        ((RampingSpeedController)drivetrain.getFLController()).prevTarget = 0;
 //        ((RampingSpeedController)drivetrain.getFRController()).prevTarget = 0;
 //        ((RampingSpeedController)drivetrain.getBLController()).prevTarget = 0;
@@ -179,7 +181,7 @@ public class Robot extends TitanBot {
 //    	SmartDashboard.putNumber("FR Wheel", drivetrain.getFRPWM());
 //    	SmartDashboard.putNumber("BL Wheel", drivetrain.getBLPWM());
 //    	SmartDashboard.putNumber("BR Wheel", drivetrain.getBRPWM());
-//    	
+//
 //    	SmartDashboard.putNumber("FL Enc", drivetrain.getFLEncoder().getRate());
 //    	SmartDashboard.putNumber("FR Enc", drivetrain.getFREncoder().getRate());
 //    	SmartDashboard.putNumber("BL Enc", drivetrain.getBLEncoder().getRate());
