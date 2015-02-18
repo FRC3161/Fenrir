@@ -47,10 +47,10 @@ public class RampingSpeedController implements SpeedController {
     private double adjust(final double target) {
         final double error = target - get();
         if (Math.abs(target) <= 0.05) {
-        	if (Math.abs(target) <= 0.02) {
+        	if (Math.abs(target) <= 0.005) {
         		return 0;
         	} else {
-        		return get()/1.03;
+        		return get()/1.02;
         	}
         }
         if (error > maxStep) {
