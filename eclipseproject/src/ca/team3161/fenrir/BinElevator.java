@@ -55,11 +55,11 @@ public class BinElevator extends RepeatingPooledSubsystem {
     }
 
     public void deployClawCommand() {
-        solenoid.set(false);
+        solenoid.set(true);
     }
 
     public void retractClawCommand() {
-        solenoid.set(true);
+        solenoid.set(false);
     }
 
     @Override

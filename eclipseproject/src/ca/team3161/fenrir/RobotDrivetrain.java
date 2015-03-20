@@ -7,17 +7,24 @@ import ca.team3161.lib.utils.controls.Gamepad;
 import ca.team3161.lib.utils.controls.LogitechDualAction.LogitechAxis;
 import ca.team3161.lib.utils.controls.LogitechDualAction.LogitechControl;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Gyro;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SpeedController;
 
 public class RobotDrivetrain extends RepeatingPooledSubsystem {
 
-    private final Gamepad gamepad;
+    private static final double TURBO_MODIFIER = 1.0;
+	private static final double NONTURBO_MODIFIER = 0.2;
+	private final Gamepad gamepad;
     private final Gyro gyro;
     private final RobotDrive driveBase;
     private final SpeedController frontLeft, frontRight, backLeft, backRight;
     private final Encoder frontLeftEncoder, frontRightEncoder, backLeftEncoder, backRightEncoder;
+    private volatile boolean auton = true;
+	private volatile double leftAutoTargetRate;
+	private volatile double rightAutoTargetRate;
+	private volatile boolean turbo = false;
 
     public RobotDrivetrain(final Gamepad gamepad,
             final SpeedController frontLeft, final SpeedController frontRight,
@@ -51,15 +58,40 @@ public class RobotDrivetrain extends RepeatingPooledSubsystem {
         require(backLeftEncoder);
         require(backRightEncoder);
     }
+    
+    public void setAutonomous(final boolean auton) {
+    	this.auton = auton;
+    	if (!auton) {
+    		setAutoRates(0, 0);
+    	}
+    }
+    
+    public void setAutoRates(final double left, final double right) {
+    	this.leftAutoTargetRate = left;
+    	this.rightAutoTargetRate = right;
+    }
+    
+    public void enableTurbo() {
+    	this.turbo = true;
+    }
+    
+    public void disableTurbo() {
+    	this.turbo = false;
+    }
 
     private void drive() {
-        driveBase.mecanumDrive_Cartesian(
-                gamepad.getValue(LogitechControl.LEFT_STICK, LogitechAxis.X),
-                gamepad.getValue(LogitechControl.LEFT_STICK, LogitechAxis.Y),
-                gamepad.getValue(LogitechControl.RIGHT_STICK, LogitechAxis.X),
-//                gyro.getAngle()
-                0
-                );
+    	if (auton) {
+    		driveBase.tankDrive(leftAutoTargetRate, rightAutoTargetRate);
+    	} else {
+    		final double adjustment = turbo ? TURBO_MODIFIER : NONTURBO_MODIFIER;
+            driveBase.mecanumDrive_Cartesian(
+                    gamepad.getValue(LogitechControl.LEFT_STICK, LogitechAxis.X) * adjustment,
+                    gamepad.getValue(LogitechControl.LEFT_STICK, LogitechAxis.Y) * adjustment,
+                    gamepad.getValue(LogitechControl.RIGHT_STICK, LogitechAxis.X) * adjustment,
+//                    gyro.getAngle()
+                    0
+                    );
+    	}
     }
 
     @Override

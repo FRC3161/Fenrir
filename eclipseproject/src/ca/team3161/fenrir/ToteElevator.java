@@ -16,7 +16,7 @@ public class ToteElevator extends RepeatingPooledSubsystem {
 
     private static final int TOTE_ENCODER_OVERSHOOT_TICKS = 100;
     private static final float ELEVATOR_RATE = 0.9f;
-	private static final double INTAKE_MOTOR_PWM = 0.65;
+	public static final double INTAKE_MOTOR_PWM = 0.65;
     private final VelocityController leftElevator, rightElevator;
 	private final SpeedController leftIntake, rightIntake, intakeControllers;
     private final Encoder leftEncoder, rightEncoder;
@@ -53,11 +53,11 @@ public class ToteElevator extends RepeatingPooledSubsystem {
         require(solenoid);
     }
 
-    private void setIntake(final double rate) {
+    public void setIntake(final double rate) {
         intakeControllers.set(rate);
     }
 
-    private void stopIntake() {
+    public void stopIntake() {
         setIntake(0);
     }
 
@@ -102,11 +102,11 @@ public class ToteElevator extends RepeatingPooledSubsystem {
         stopIntake();
     }
 
-    private void openClaws() {
+    public void openClaws() {
         solenoid.set(true);
     }
 
-    private void closeClaws() {
+    public void closeClaws() {
         solenoid.set(false);
     }
 

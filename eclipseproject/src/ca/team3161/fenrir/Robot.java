@@ -13,6 +13,13 @@ import ca.team3161.lib.utils.controls.LogitechDualAction;
 import ca.team3161.lib.utils.controls.LogitechDualAction.LogitechAxis;
 import ca.team3161.lib.utils.controls.LogitechDualAction.LogitechButton;
 import ca.team3161.lib.utils.controls.LogitechDualAction.LogitechControl;
+
+import com.ni.vision.NIVision;
+import com.ni.vision.NIVision.DrawMode;
+import com.ni.vision.NIVision.Image;
+import com.ni.vision.NIVision.ShapeMode;
+
+import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Gyro;
@@ -20,6 +27,7 @@ import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends TitanBot {
 
@@ -29,7 +37,10 @@ public class Robot extends TitanBot {
     private final Gamepad gamepad;
     private ToteElevator toteElevator;
     private BinElevator binElevator;
+    private final DigitalInput binElevatorTopSwitch = new DigitalInput(18);
     private final Preferences prefs = Preferences.getInstance();
+    private int webcamSession = 0;
+    private Image webcamImage = null;
 
     public Robot() {
         this.gamepad = new LogitechDualAction(0, 10, TimeUnit.MILLISECONDS);
@@ -45,7 +56,7 @@ public class Robot extends TitanBot {
                 new Encoder(12, 13),
                 new Solenoid(0),
                 new DigitalInput(17),
-                new DigitalInput(18)
+                binElevatorTopSwitch
                 );
 	}
 
@@ -124,6 +135,22 @@ public class Robot extends TitanBot {
 
     @Override
     public void autonomousRoutine() throws Exception {
+    	if (!binElevatorTopSwitch.get()) {
+    		return;
+    	}
+    	drivetrain.start();
+    	toteElevator.start();
+    	drivetrain.setAutonomous(true);
+    	toteElevator.closeClaws();
+    	toteElevator.advanceElevatorCommand();
+    	waitFor(1, TimeUnit.SECONDS);
+    	drivetrain.setAutoRates(0.7, -0.7);
+    	toteElevator.setIntake(-ToteElevator.INTAKE_MOTOR_PWM);
+    	waitFor(1, TimeUnit.SECONDS);
+    	toteElevator.stopIntake();
+    	waitFor(3500, TimeUnit.MILLISECONDS);
+    	drivetrain.setAutoRates(0, 0);
+    	drivetrain.setAutonomous(false);
     }
 
     @Override
@@ -133,15 +160,19 @@ public class Robot extends TitanBot {
 
     @Override
     public void robotInit() {
+    	webcamImage = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
+    	
+    	webcamSession = NIVision.IMAQdxOpenCamera("cam0",
+    			NIVision.IMAQdxCameraControlMode.CameraControlModeController);
+    	NIVision.IMAQdxConfigureGrab(webcamSession);
+    	
         for (final LogitechControl control : LogitechControl.values()) {
             for (final LogitechAxis axis : LogitechAxis.values()) {
-                gamepad.setMode(control, axis, new DeadbandJoystickMode(0.05));
+                gamepad.setMode(control, axis, d -> Math.abs(d) < 0.05 ? 0 : d); // deadband around [-0.05, 0.05]
             }
         }
-        gamepad.bind(LogitechButton.A, PressType.PRESS, toteElevator::advanceElevatorCommand);
-//        gamepad.bind(LogitechButton.A, PressType.RELEASE, toteElevator::stopElevatorCommand);
+        gamepad.bind(LogitechButton.A, PressType.PRESS, this::intake);
         gamepad.bind(LogitechButton.B, PressType.PRESS, toteElevator::retreatElevatorCommand);
-//        gamepad.bind(LogitechButton.B, PressType.RELEASE, toteElevator::stopElevatorCommand);
         gamepad.bind(LogitechButton.RIGHT_TRIGGER, PressType.PRESS, toteElevator::startIntakeCommand);
         gamepad.bind(LogitechButton.RIGHT_TRIGGER, PressType.RELEASE, toteElevator::stopIntakeCommand);
 
@@ -151,12 +182,19 @@ public class Robot extends TitanBot {
         gamepad.bind(LogitechButton.Y, PressType.RELEASE, binElevator::stopCommand);
         gamepad.bind(LogitechButton.LEFT_TRIGGER, binElevator::deployClawCommand);
         gamepad.bind(LogitechButton.LEFT_BUMPER, binElevator::retractClawCommand);
-
-        //        CameraServer.getInstance().startAutomaticCapture();
+        
+        gamepad.bind(LogitechButton.RIGHT_BUMPER, PressType.PRESS, drivetrain::enableTurbo);
+        gamepad.bind(LogitechButton.RIGHT_BUMPER, PressType.RELEASE, drivetrain::disableTurbo);
+    }
+    
+    private void intake() {
+    	binElevator.retractClawCommand();
+    	toteElevator.advanceElevatorCommand();
     }
 
     @Override
     public void disabledInit() {
+    	NIVision.IMAQdxStopAcquisition(webcamSession);
         gamepad.disableBindings();
         drivetrain.cancel();
         toteElevator.cancel();
@@ -165,28 +203,35 @@ public class Robot extends TitanBot {
 
     @Override
     public void teleopInit() {
+    	NIVision.IMAQdxStartAcquisition(webcamSession);
+    	drivetrain.setAutonomous(false);
         gamepad.enableBindings();
         drivetrain.start();
         toteElevator.start();
         binElevator.start();
-
-//        ((RampingSpeedController)drivetrain.getFLController()).prevTarget = 0;
-//        ((RampingSpeedController)drivetrain.getFRController()).prevTarget = 0;
-//        ((RampingSpeedController)drivetrain.getBLController()).prevTarget = 0;
-//        ((RampingSpeedController)drivetrain.getBRController()).prevTarget = 0;
+        toteElevator.openClaws();
     }
 
     @Override
     public void teleopRoutine() {
-//    	SmartDashboard.putNumber("FL Wheel", drivetrain.getFLPWM());
-//    	SmartDashboard.putNumber("FR Wheel", drivetrain.getFRPWM());
-//    	SmartDashboard.putNumber("BL Wheel", drivetrain.getBLPWM());
-//    	SmartDashboard.putNumber("BR Wheel", drivetrain.getBRPWM());
-//
-//    	SmartDashboard.putNumber("FL Enc", drivetrain.getFLEncoder().getRate());
-//    	SmartDashboard.putNumber("FR Enc", drivetrain.getFREncoder().getRate());
-//    	SmartDashboard.putNumber("BL Enc", drivetrain.getBLEncoder().getRate());
-//    	SmartDashboard.putNumber("BR Enc", drivetrain.getBREncoder().getRate());
+    	renderWebcam();
+    	SmartDashboard.putNumber("FL Enc", drivetrain.getFLEncoder().getRate());
+    	SmartDashboard.putNumber("FR Enc", drivetrain.getFREncoder().getRate());
+    	SmartDashboard.putNumber("BL Enc", drivetrain.getBLEncoder().getRate());
+    	SmartDashboard.putNumber("BR Enc", drivetrain.getBREncoder().getRate());
+    }
+    
+    private void renderWebcam() {
+    	try {
+        	final NIVision.Rect rect = new NIVision.Rect(10, 10, 100, 100);
+        	NIVision.IMAQdxGrab(webcamSession, webcamImage, 1);
+        	NIVision.imaqDrawShapeOnImage(webcamImage, webcamImage, rect,
+        			DrawMode.DRAW_VALUE, ShapeMode.SHAPE_OVAL, 0.0f);
+        	
+        	CameraServer.getInstance().setImage(webcamImage);    		
+    	} catch (final Exception e) {
+    		e.printStackTrace();
+    	}
     }
 
 }
