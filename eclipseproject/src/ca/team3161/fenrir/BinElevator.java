@@ -12,13 +12,13 @@ public class BinElevator extends RepeatingPooledSubsystem {
 
     private static final double MOTOR_PWM = 0.75;
     private volatile double pwmTarget = 0;
-	private final SpeedController controller;
+    private final SpeedController controller;
     private final Solenoid solenoid;
     private final Encoder encoder;
     private final DigitalInput bottomLimitSwitch, topLimitSwitch;
 
     public BinElevator(final SpeedController controller, final Encoder encoder, final Solenoid solenoid,
-    		final DigitalInput bottomLimitSwitch, final DigitalInput topLimitSwitch) {
+            final DigitalInput bottomLimitSwitch, final DigitalInput topLimitSwitch) {
         super(10, TimeUnit.MILLISECONDS);
         this.controller = controller;
         this.solenoid = solenoid;
@@ -64,13 +64,13 @@ public class BinElevator extends RepeatingPooledSubsystem {
 
     @Override
     public void task() {
-    	final boolean bottomSwitch = !bottomLimitSwitch.get(), topSwitch = !topLimitSwitch.get();
+        final boolean bottomSwitch = !bottomLimitSwitch.get(), topSwitch = !topLimitSwitch.get();
         if (pwmTarget > 0 && topSwitch) {
-        	stop();
+            stop();
         } else if (pwmTarget < 0 && bottomSwitch) {
-        	stop();
+            stop();
         } else {
-        	controller.set(pwmTarget);
+            controller.set(pwmTarget);
         }
     }
 

@@ -16,9 +16,9 @@ public class ToteElevator extends RepeatingPooledSubsystem {
 
     private static final int TOTE_ENCODER_OVERSHOOT_TICKS = 100;
     private static final float ELEVATOR_RATE = 0.9f;
-	public static final double INTAKE_MOTOR_PWM = 0.65;
+    public static final double INTAKE_MOTOR_PWM = 0.65;
     private final VelocityController leftElevator, rightElevator;
-	private final SpeedController leftIntake, rightIntake, intakeControllers;
+    private final SpeedController leftIntake, rightIntake, intakeControllers;
     private final Encoder leftEncoder, rightEncoder;
     private final Solenoid solenoid;
     private final DigitalInput leftPhotoGate, rightPhotoGate;
@@ -85,20 +85,20 @@ public class ToteElevator extends RepeatingPooledSubsystem {
     }
 
     public void stopLeftElevator() {
-    	leftPidTarget = 0;
+        leftPidTarget = 0;
     }
 
     public void stopRightElevator() {
-    	rightPidTarget = 0;
+        rightPidTarget = 0;
     }
 
     public void startIntakeCommand() {
-    	openClaws();
+        openClaws();
         setIntake(INTAKE_MOTOR_PWM);
     }
 
     public void stopIntakeCommand() {
-    	closeClaws();
+        closeClaws();
         stopIntake();
     }
 
@@ -112,32 +112,32 @@ public class ToteElevator extends RepeatingPooledSubsystem {
 
     @Override
     public void task() {
-    	leftElevator.set(leftPidTarget);
-    	rightElevator.set(rightPidTarget);
-    	SmartDashboard.putNumber("left elev enc", getLeftEncoder().get());
-    	SmartDashboard.putNumber("right elev enc", getRightEncoder().get());
-    	if (!leftPhotoGate.get() && (leftEncoder.get() > leftEncoderTicks + TOTE_ENCODER_OVERSHOOT_TICKS || leftEncoder.get() < leftEncoderTicks - TOTE_ENCODER_OVERSHOOT_TICKS)) {
-    		leftHookCount++;
-    	}
-    	if (!rightPhotoGate.get() && (rightEncoder.get() > rightEncoderTicks + TOTE_ENCODER_OVERSHOOT_TICKS || rightEncoder.get() < rightEncoderTicks - TOTE_ENCODER_OVERSHOOT_TICKS)) {
-    		rightHookCount++;
-    	}
-    	if (leftHookCount >= leftHookCountTarget) {
-    		leftHookCount = leftHookCountTarget;
-    		stopLeftElevator();
-    	}
-    	if (rightHookCount >= rightHookCountTarget) {
-    		rightHookCount = rightHookCountTarget;
-    		stopRightElevator();
-    	}
+        leftElevator.set(leftPidTarget);
+        rightElevator.set(rightPidTarget);
+        SmartDashboard.putNumber("left elev enc", getLeftEncoder().get());
+        SmartDashboard.putNumber("right elev enc", getRightEncoder().get());
+        if (!leftPhotoGate.get() && (leftEncoder.get() > leftEncoderTicks + TOTE_ENCODER_OVERSHOOT_TICKS || leftEncoder.get() < leftEncoderTicks - TOTE_ENCODER_OVERSHOOT_TICKS)) {
+            leftHookCount++;
+        }
+        if (!rightPhotoGate.get() && (rightEncoder.get() > rightEncoderTicks + TOTE_ENCODER_OVERSHOOT_TICKS || rightEncoder.get() < rightEncoderTicks - TOTE_ENCODER_OVERSHOOT_TICKS)) {
+            rightHookCount++;
+        }
+        if (leftHookCount >= leftHookCountTarget) {
+            leftHookCount = leftHookCountTarget;
+            stopLeftElevator();
+        }
+        if (rightHookCount >= rightHookCountTarget) {
+            rightHookCount = rightHookCountTarget;
+            stopRightElevator();
+        }
     }
 
     public Encoder getLeftEncoder() {
-    	return leftEncoder;
+        return leftEncoder;
     }
 
     public Encoder getRightEncoder() {
-    	return rightEncoder;
+        return rightEncoder;
     }
 
 }

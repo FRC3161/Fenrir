@@ -31,9 +31,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends TitanBot {
 
-	public static final int MAX_DRIVETRAIN_RATE = 1500;
-	public static final int MAX_ELEVATOR_RATE = 600;
-	private RobotDrivetrain drivetrain;
+    public static final int MAX_DRIVETRAIN_RATE = 1500;
+    public static final int MAX_ELEVATOR_RATE = 600;
+    private RobotDrivetrain drivetrain;
     private final Gamepad gamepad;
     private ToteElevator toteElevator;
     private BinElevator binElevator;
@@ -50,45 +50,45 @@ public class Robot extends TitanBot {
         setupBinElevator();
     }
 
-	private void setupBinElevator() {
-		this.binElevator = new BinElevator(
+    private void setupBinElevator() {
+        this.binElevator = new BinElevator(
                 new Drivetrain(new Talon(8)).setInverted(true),
                 new Encoder(12, 13),
                 new Solenoid(0),
                 new DigitalInput(17),
                 binElevatorTopSwitch
                 );
-	}
+    }
 
-	private void setupToteElevator() {
-		final float kP = 0.0015f;
-		final float kI = 0.003f;
-		final float kD = 0;
-		final float maxI = 1200;
-		final float deadband = 1;
-		final Encoder leftElevatorEncoder = new Encoder(8, 9);
+    private void setupToteElevator() {
+        final float kP = 0.0015f;
+        final float kI = 0.003f;
+        final float kD = 0;
+        final float maxI = 1200;
+        final float deadband = 1;
+        final Encoder leftElevatorEncoder = new Encoder(8, 9);
         final VelocityController leftElevatorController = new VelocityController(new Drivetrain(new Talon(4)).setInverted(false),
-        		leftElevatorEncoder, MAX_ELEVATOR_RATE, kP, kI, kD, maxI, deadband);
+                leftElevatorEncoder, MAX_ELEVATOR_RATE, kP, kI, kD, maxI, deadband);
 
         final Encoder rightElevatorEncoder = new Encoder (15, 14);
         final VelocityController rightElevatorController = new VelocityController(new Drivetrain(new Talon(5)).setInverted(true),
-        		rightElevatorEncoder, MAX_ELEVATOR_RATE, kP, kI, kD, maxI, deadband);
+                rightElevatorEncoder, MAX_ELEVATOR_RATE, kP, kI, kD, maxI, deadband);
 
         this.toteElevator = new ToteElevator(
                 leftElevatorController,
                 rightElevatorController,
-                new Drivetrain(new Talon(6)).setInverted(true), 	//left intake
-                new Drivetrain(new Talon(7)).setInverted(true), 	//right intake
+                new Drivetrain(new Talon(6)).setInverted(true),     //left intake
+                new Drivetrain(new Talon(7)).setInverted(true),     //right intake
                 leftElevatorEncoder,
                 rightElevatorEncoder,
                 new DigitalInput(19),
                 new DigitalInput(20),
                 new Solenoid(1)
                 );
-	}
+    }
 
-	private void setupDrivetrain() {
-		final float kP = 0.00135f;
+    private void setupDrivetrain() {
+        final float kP = 0.00135f;
         final float kI = 0.0002f;
         final float kD = 0;
         final float maxI = 4000;
@@ -119,38 +119,38 @@ public class Robot extends TitanBot {
                 BRDriveEncoder,
                 driveGyro
                 );
-	}
+    }
 
     public static SpeedController getDriveController(final SpeedController baseController, final boolean inverted,
-    		final float kP, final float kI, final float kD,
-    		final Encoder encoder,
-    		final int maxRate, final float maxI, final float deadband, final double maxStep) {
-    	return new RampingSpeedController(
-	    			new VelocityController(
-		    			new Drivetrain(baseController)
-		    			.setInverted(inverted),
-	        		encoder, maxRate, kP, kI, kD, maxI, deadband),
-        		maxStep);
+            final float kP, final float kI, final float kD,
+            final Encoder encoder,
+            final int maxRate, final float maxI, final float deadband, final double maxStep) {
+        return new RampingSpeedController(
+                    new VelocityController(
+                        new Drivetrain(baseController)
+                        .setInverted(inverted),
+                    encoder, maxRate, kP, kI, kD, maxI, deadband),
+                maxStep);
     }
 
     @Override
     public void autonomousRoutine() throws Exception {
-    	if (!binElevatorTopSwitch.get()) {
-    		return;
-    	}
-    	drivetrain.start();
-    	toteElevator.start();
-    	drivetrain.setAutonomous(true);
-    	toteElevator.closeClaws();
-    	toteElevator.advanceElevatorCommand();
-    	waitFor(1, TimeUnit.SECONDS);
-    	drivetrain.setAutoRates(0.7, -0.7);
-    	toteElevator.setIntake(-ToteElevator.INTAKE_MOTOR_PWM);
-    	waitFor(1, TimeUnit.SECONDS);
-    	toteElevator.stopIntake();
-    	waitFor(3500, TimeUnit.MILLISECONDS);
-    	drivetrain.setAutoRates(0, 0);
-    	drivetrain.setAutonomous(false);
+        if (!binElevatorTopSwitch.get()) {
+            return;
+        }
+        drivetrain.start();
+        toteElevator.start();
+        drivetrain.setAutonomous(true);
+        toteElevator.closeClaws();
+        toteElevator.advanceElevatorCommand();
+        waitFor(1, TimeUnit.SECONDS);
+        drivetrain.setAutoRates(0.7, -0.7);
+        toteElevator.setIntake(-ToteElevator.INTAKE_MOTOR_PWM);
+        waitFor(1, TimeUnit.SECONDS);
+        toteElevator.stopIntake();
+        waitFor(3500, TimeUnit.MILLISECONDS);
+        drivetrain.setAutoRates(0, 0);
+        drivetrain.setAutonomous(false);
     }
 
     @Override
@@ -160,12 +160,12 @@ public class Robot extends TitanBot {
 
     @Override
     public void robotInit() {
-    	webcamImage = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
-    	
-    	webcamSession = NIVision.IMAQdxOpenCamera("cam0",
-    			NIVision.IMAQdxCameraControlMode.CameraControlModeController);
-    	NIVision.IMAQdxConfigureGrab(webcamSession);
-    	
+        webcamImage = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
+        
+        webcamSession = NIVision.IMAQdxOpenCamera("cam0",
+                NIVision.IMAQdxCameraControlMode.CameraControlModeController);
+        NIVision.IMAQdxConfigureGrab(webcamSession);
+
         for (final LogitechControl control : LogitechControl.values()) {
             for (final LogitechAxis axis : LogitechAxis.values()) {
                 gamepad.setMode(control, axis, d -> Math.abs(d) < 0.05 ? 0 : d); // deadband around [-0.05, 0.05]
@@ -188,13 +188,13 @@ public class Robot extends TitanBot {
     }
     
     private void intake() {
-    	binElevator.retractClawCommand();
-    	toteElevator.advanceElevatorCommand();
+        binElevator.retractClawCommand();
+        toteElevator.advanceElevatorCommand();
     }
 
     @Override
     public void disabledInit() {
-    	NIVision.IMAQdxStopAcquisition(webcamSession);
+        NIVision.IMAQdxStopAcquisition(webcamSession);
         gamepad.disableBindings();
         drivetrain.cancel();
         toteElevator.cancel();
@@ -203,8 +203,8 @@ public class Robot extends TitanBot {
 
     @Override
     public void teleopInit() {
-    	NIVision.IMAQdxStartAcquisition(webcamSession);
-    	drivetrain.setAutonomous(false);
+        NIVision.IMAQdxStartAcquisition(webcamSession);
+        drivetrain.setAutonomous(false);
         gamepad.enableBindings();
         drivetrain.start();
         toteElevator.start();
@@ -214,24 +214,24 @@ public class Robot extends TitanBot {
 
     @Override
     public void teleopRoutine() {
-    	renderWebcam();
-    	SmartDashboard.putNumber("FL Enc", drivetrain.getFLEncoder().getRate());
-    	SmartDashboard.putNumber("FR Enc", drivetrain.getFREncoder().getRate());
-    	SmartDashboard.putNumber("BL Enc", drivetrain.getBLEncoder().getRate());
-    	SmartDashboard.putNumber("BR Enc", drivetrain.getBREncoder().getRate());
+        renderWebcam();
+        SmartDashboard.putNumber("FL Enc", drivetrain.getFLEncoder().getRate());
+        SmartDashboard.putNumber("FR Enc", drivetrain.getFREncoder().getRate());
+        SmartDashboard.putNumber("BL Enc", drivetrain.getBLEncoder().getRate());
+        SmartDashboard.putNumber("BR Enc", drivetrain.getBREncoder().getRate());
     }
     
     private void renderWebcam() {
-    	try {
-        	final NIVision.Rect rect = new NIVision.Rect(10, 10, 100, 100);
-        	NIVision.IMAQdxGrab(webcamSession, webcamImage, 1);
-        	NIVision.imaqDrawShapeOnImage(webcamImage, webcamImage, rect,
-        			DrawMode.DRAW_VALUE, ShapeMode.SHAPE_OVAL, 0.0f);
-        	
-        	CameraServer.getInstance().setImage(webcamImage);    		
-    	} catch (final Exception e) {
-    		e.printStackTrace();
-    	}
+        try {
+            final NIVision.Rect rect = new NIVision.Rect(10, 10, 100, 100);
+            NIVision.IMAQdxGrab(webcamSession, webcamImage, 1);
+            NIVision.imaqDrawShapeOnImage(webcamImage, webcamImage, rect,
+                    DrawMode.DRAW_VALUE, ShapeMode.SHAPE_OVAL, 0.0f);
+            
+            CameraServer.getInstance().setImage(webcamImage);           
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }
