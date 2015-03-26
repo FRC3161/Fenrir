@@ -43,7 +43,7 @@ public class Robot extends TitanBot {
     private Image webcamImage = null;
 
     public Robot() {
-        this.gamepad = new LogitechDualAction(0, 10, TimeUnit.MILLISECONDS);
+        this.gamepad = new LogitechDualAction(0);
 
         setupDrivetrain();
         setupToteElevator();

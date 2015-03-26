@@ -85,7 +85,7 @@ public class RobotDrivetrain extends RepeatingPooledSubsystem {
     	} else {
     		final double adjustment = turbo ? TURBO_MODIFIER : NONTURBO_MODIFIER;
             driveBase.mecanumDrive_Cartesian(
-                    gamepad.getValue(LogitechControl.LEFT_STICK, LogitechAxis.X) * adjustment,
+                    gamepad.getValue(LogitechControl.LEFT_STICK, LogitechAxis.X) * adjustment * 1.5,
                     gamepad.getValue(LogitechControl.LEFT_STICK, LogitechAxis.Y) * adjustment,
                     gamepad.getValue(LogitechControl.RIGHT_STICK, LogitechAxis.X) * adjustment,
 //                    gyro.getAngle()
