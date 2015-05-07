@@ -42,7 +42,7 @@ public class Robot extends TitanBot {
     private Image webcamImage = null;
 
     public Robot() {
-        this.gamepad = new LogitechDualAction(0, 20, TimeUnit.MILLISECONDS);
+        this.gamepad = new LogitechDualAction(0, 10, TimeUnit.MILLISECONDS);
 
         setupDrivetrain();
         setupToteElevator();
@@ -107,7 +107,6 @@ public class Robot extends TitanBot {
 
         final Gyro driveGyro = new Gyro(0);
         this.drivetrain = new RobotDrivetrain(
-                gamepad,
                 FLDriveController,
                 FRDriveController,
                 BLDriveController,
@@ -160,7 +159,7 @@ public class Robot extends TitanBot {
     @Override
     public void robotInit() {
         webcamImage = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
-        
+
         webcamSession = NIVision.IMAQdxOpenCamera("cam0",
                 NIVision.IMAQdxCameraControlMode.CameraControlModeController);
         NIVision.IMAQdxConfigureGrab(webcamSession);
@@ -181,11 +180,15 @@ public class Robot extends TitanBot {
         gamepad.bind(LogitechButton.Y, PressType.RELEASE, binElevator::stopCommand);
         gamepad.bind(LogitechButton.LEFT_TRIGGER, binElevator::deployClawCommand);
         gamepad.bind(LogitechButton.LEFT_BUMPER, binElevator::retractClawCommand);
-        
+
         gamepad.bind(LogitechButton.RIGHT_BUMPER, PressType.PRESS, drivetrain::enableTurbo);
         gamepad.bind(LogitechButton.RIGHT_BUMPER, PressType.RELEASE, drivetrain::disableTurbo);
+
+        gamepad.map(LogitechControl.LEFT_STICK, LogitechAxis.X, drivetrain::setDriveStrafe);
+        gamepad.map(LogitechControl.LEFT_STICK, LogitechAxis.Y, drivetrain::setDriveForward);
+        gamepad.map(LogitechControl.RIGHT_STICK, LogitechAxis.X, drivetrain::setDriveTurn);
     }
-    
+
     private void intake() {
         binElevator.retractClawCommand();
         toteElevator.advanceElevatorCommand();
@@ -219,15 +222,15 @@ public class Robot extends TitanBot {
         SmartDashboard.putNumber("BL Enc", drivetrain.getBLEncoder().getRate());
         SmartDashboard.putNumber("BR Enc", drivetrain.getBREncoder().getRate());
     }
-    
+
     private void renderWebcam() {
         try {
             final NIVision.Rect rect = new NIVision.Rect(10, 10, 100, 100);
             NIVision.IMAQdxGrab(webcamSession, webcamImage, 1);
             NIVision.imaqDrawShapeOnImage(webcamImage, webcamImage, rect,
                     DrawMode.DRAW_VALUE, ShapeMode.SHAPE_OVAL, 0.0f);
-            
-            CameraServer.getInstance().setImage(webcamImage);           
+
+            CameraServer.getInstance().setImage(webcamImage);
         } catch (final Exception e) {
             e.printStackTrace();
         }
