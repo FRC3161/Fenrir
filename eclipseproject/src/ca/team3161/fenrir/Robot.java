@@ -2,6 +2,7 @@
 package ca.team3161.fenrir;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 import ca.team3161.lib.robot.Drivetrain;
 import ca.team3161.lib.robot.TitanBot;
@@ -32,6 +33,7 @@ public class Robot extends TitanBot {
 
     public static final int MAX_DRIVETRAIN_RATE = 1500;
     public static final int MAX_ELEVATOR_RATE = 600;
+    public static final Function<Double, Double> FIVE_PERCENT_DEADBAND = d -> Math.abs(d) < 0.05 ? 0 : d;
     private RobotDrivetrain drivetrain;
     private final Gamepad gamepad;
     private ToteElevator toteElevator;
@@ -166,7 +168,7 @@ public class Robot extends TitanBot {
 
         for (final LogitechControl control : LogitechControl.values()) {
             for (final LogitechAxis axis : LogitechAxis.values()) {
-                gamepad.setMode(control, axis, d -> Math.abs(d) < 0.05 ? 0 : d); // deadband around [-0.05, 0.05]
+                gamepad.setMode(control, axis, FIVE_PERCENT_DEADBAND);
             }
         }
         gamepad.bind(LogitechButton.A, PressType.PRESS, this::intake);
